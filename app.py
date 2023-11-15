@@ -1,148 +1,92 @@
 import time
-from program_fungs_membaca_dan_mengirim_data import baca_data_terbaru
-from obswebsocket import obsws, requests
-from obswebsocket.exceptions import ConnectionFailure
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import csv
+from flask import Flask, render_template, jsonify
 
-password = "XD9RjF4blgdS9E3f"
+app = Flask(__name__)
 
-ws = obsws('localhost', 4455, password)
-ws.connect()
+class FileChangeHandler(FileSystemEventHandler):
+    def __init__(self, filename, data_handler):
+        self.filename = filename
+        self.data_handler = data_handler
+        self.data_terakhir = None
 
-scenes = ws.call(requests.GetSceneList())
-list_scene = scenes.getScenes()
+    def on_modified(self, event):
+        if not event.is_directory and event.src_path.endswith(self.filename):
+            start_time = time.time()  # Waktu awal
+            with open(self.filename, 'r') as file:
+                reader = csv.reader(file)
+                data = list(reader)
 
-"""
-def handle_data(sequence,nomor_body,vin_no,car,steer,suffix,Kode_relay, Box_X, Box_Y, Box_Z):
-    print("=============================")
-    print("Sequence   : " + sequence)
-    print("Nomor Body : " + nomor_body)
-    print("Vin_no     : " + vin_no)
-    print("Car        : " + car)
-    print("Steer      : " + steer)
-    print("Suffix     : " + suffix)
-    print("Kode Relay : " + Kode_relay)
-    print("Box X      : " + Box_X)
-    print("Box Y      : " + Box_Y)
-    print("Box Z      : " + Box_Z)
-    print("=============================")
-"""
+                if data != self.data_terakhir:
+                    self.data_terakhir = data
+                    for row in data:
+                        sequence = row[0]
+                        nomor_body = row[1]
+                        vin_no = row[2]
+                        car = row[3]
+                        steer = row[4]
+                        suffix = row[5]
+                        Kode_relay = row[6]
+                        Box_X = row[7]
+                        Box_Y = row[8]
+                        Box_Z = row[9]
 
+                        self.data_handler(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z)  # Durasi loop
 
-def command(sequence,nomor_body,vin_no,car,steer,suffix,Kode_relay, Box_X, Box_Y, Box_Z):
-    start_time = time.time()
-    print("=============================")
-    print("Sequence   : " + sequence)
-    print("Nomor Body : " + nomor_body)
-    print("Vin_no     : " + vin_no)
-    print("Car        : " + car)
-    print("Steer      : " + steer)
-    print("Suffix     : " + suffix)
-    print("Kode Relay : " + Kode_relay)
-    print("-----------------------------")
+def baca_data_terbaru(nama_file, data_handler):
+    event_handler = FileChangeHandler(nama_file, data_handler)
+    observer = Observer()
+    observer.schedule(event_handler, path='.', recursive=False)
+    observer.start()
 
-    if car == "Fortuner":
-        if steer == "LHD":
-            print("Box X      : " + Box_X)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
-            print("Perintah detect2.py/"+ Box_X + "/best.pt")
-            print(list_scene[2]['sceneName'])
-            time.sleep(3) #seolah-olah proses
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
-            print("Box Y      : " + Box_Y)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Y + "/best.pt")
-            print(list_scene[1]['sceneName'])
-            time.sleep(3) #seolah-olah proses
+def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
+    data = {
+        'sequence': sequence,
+        'nomor_body': nomor_body,
+        'vin_no': vin_no,
+        'car': car,
+        'steer': steer,
+        'suffix': suffix,
+        'Kode_relay': Kode_relay,
+        'Box_X': Box_X,
+        'Box_Y': Box_Y,
+        'Box_Z': Box_Z
+    }
+    return data
 
-            print("Box Z      : " + Box_Z)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[3]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Z + "/best.pt")
-            print(list_scene[3]['sceneName'])
-            time.sleep(3) #seolah-olah proses
+@app.route('/')
+def show_data():
+    return render_template('index.html')
 
-            end_time = time.time()
-            duration = end_time-start_time
-            print("=============================")
-            print(f"Durasi loop: {duration} detik")
-            
-            
-        
-        else :
-            print("Box Y      : " + Box_Y)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Y + "/best.pt")
-            print(list_scene[2]['sceneName'])
-            time.sleep(3) #seolah-olah proses
+@app.route('/get_data')
+def get_data():
+    with open('baca_file_ini.csv', 'r') as file:
+        reader = csv.reader(file)
+        data = list(reader)
+        if data:
+            row = data[-1]  # Ambil baris terakhir
+            sequence = row[0]
+            nomor_body = row[1]
+            vin_no = row[2]
+            car = row[3]
+            steer = row[4]
+            suffix = row[5]
+            Kode_relay = row[6]
+            Box_X = row[7]
+            Box_Y = row[8]
+            Box_Z = row[9]
+            data = handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z)
+            return jsonify(data)
+    return jsonify(None)
 
-            print("Box Z      : " + Box_Z)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Z + "/best.pt")
-            print(list_scene[0]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            print("Box X      : " + Box_X)
-            ws.call(requests.SetCurrentProgramScene(sceneName =list_scene[1]['sceneName']))
-            print("Perintah detect2.py/"+ Box_X + "/best.pt")
-            print(list_scene[1]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            
-            end_time = time.time()
-            duration = end_time-start_time
-            print("=============================")
-            print(f"Durasi proses: {duration} detik")
-    
-    else :
-        if steer == "LHD":
-            print("Box X      : " + Box_X)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
-            print("Perintah detect2.py/"+ Box_X + "/best.pt")
-            print(list_scene[2]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            print("Box Y      : " + Box_Y)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Y + "/best.pt")
-            print(list_scene[1]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            print("Box Z      : " + Box_Z)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[3]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Z + "/best.pt")
-            print(list_scene[3]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            end_time = time.time()
-            duration = end_time-start_time
-            print("=============================")
-            print(f"Durasi loop: {duration} detik")
-            
-        
-        else :
-            print("Box Y      : " + Box_Y)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
-            print("Tidak ada objek")
-            print(list_scene[2]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            print("Box Z      : " + Box_Z)
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
-            print("Perintah detect2.py/"+ Box_Z + "/best.pt")
-            print(list_scene[0]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            print("Box X      : " + Box_X)
-            ws.call(requests.SetCurrentProgramScene(sceneName =list_scene[1]['sceneName']))
-            print("Perintah detect2.py/"+ Box_X + "/best.pt")
-            print(list_scene[1]['sceneName'])
-            time.sleep(3) #seolah-olah proses
-
-            
-            end_time = time.time()
-            duration = end_time-start_time
-            print("=============================")
-            print(f"Durasi proses: {duration} detik")
-    
-baca_data_terbaru('baca_file_ini.csv', command)
-
-ws.disconnect()
+if __name__ == "__main__":
+    app.run()
