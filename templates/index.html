@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Fetch Example</title>
+    <script>
+        function fetchData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('value').textContent = data.value;
+                    document.getElementById('timestamp').textContent = data.timestamp;
+                })
+                .catch(error => console.log(error));
+        }
+
+        setInterval(fetchData, 5000);
+    </script>
+</head>
+<body>
+    <h1>Flask Fetch Example</h1>
+    <p>Value: <span id="value"></span></p>
+    <p>Timestamp: <span id="timestamp"></span></p>
+</body>
+</html>
