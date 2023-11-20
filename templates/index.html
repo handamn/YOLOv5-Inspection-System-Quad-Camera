@@ -1,24 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Flask Fetch Example</title>
+    <title>Latest Images</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        function fetchData() {
-            fetch('/data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('value').textContent = data.value;
-                    document.getElementById('timestamp').textContent = data.timestamp;
-                })
-                .catch(error => console.log(error));
+        function updateLatestImages() {
+            $.ajax({
+                url: '/latest_images',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.display_images.x) {
+                        $('#latest-image-x').attr('src', '/uploads/' + data.image_x);
+                    } else {
+                        $('#latest-image-x').attr('src', '/uploads/menunggu.jpeg');
+                    }
+                    if (data.display_images.y) {
+                        $('#latest-image-y').attr('src', '/uploads/' + data.image_y);
+                    } else {
+                        $('#latest-image-y').attr('src', '/uploads/menunggu.jpeg');
+                    }
+                    if (data.display_images.z) {
+                        $('#latest-image-z').attr('src', '/uploads/' + data.image_z);
+                    } else {
+                        $('#latest-image-z').attr('src', '/uploads/menunggu.jpeg');
+                    }
+                },
+                complete: function () {
+                    setTimeout(updateLatestImages, 1000);  // Memperbarui setiap 1 detik
+                }
+            });
         }
 
-        setInterval(fetchData, 5000);
+        $(document).ready(function () {
+            updateLatestImages();
+
+            $('#reset-button').click(function () {
+                $.ajax({
+                    url: '/reset_images',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            $('#latest-image-x').attr('src', '/uploads/menunggu.jpeg');
+                            $('#latest-image-y').attr('src', '/uploads/menunggu.jpeg');
+                            $('#latest-image-z').attr('src', '/uploads/menunggu.jpeg');
+                        }
+                    }
+                });
+            });
+        });
     </script>
 </head>
 <body>
-    <h1>Flask Fetch Example</h1>
-    <p>Value: <span id="value"></span></p>
-    <p>Timestamp: <span id="timestamp"></span></p>
+    <h1>Latest Images:</h1>
+    <h2>Image with X:</h2>
+    <img id="latest-image-x" src="" alt="Latest Image X">
+
+    <h2>Image with Y:</h2>
+    <img id="latest-image-y" src="" alt="Latest Image Y">
+
+    <h2>Image with Z:</h2>
+    <img id="latest-image-z" src="" alt="Latest Image Z">
+
 </body>
 </html>
