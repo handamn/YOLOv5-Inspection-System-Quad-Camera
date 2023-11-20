@@ -29,10 +29,18 @@ class FileChangeHandler(FileSystemEventHandler):
                         Box_X = row[7]
                         Box_Y = row[8]
                         Box_Z = row[9]
-
-                    
-
+                        
                         self.data_handler(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z)  # Durasi loop
+
+def write_to_csv(data):
+    with open('coba.csv', 'w', newline='') as output_file:
+        writer = csv.writer(output_file)
+        writer.writerows(data)
+
+def update_csv(data):
+    with open('coba2.csv', 'a', newline='') as output_file:
+        writer = csv.writer(output_file)
+        writer.writerows(data)
 
 def baca_data_terbaru(nama_file, data_handler):
     event_handler = FileChangeHandler(nama_file, data_handler)
@@ -47,7 +55,7 @@ def baca_data_terbaru(nama_file, data_handler):
         observer.stop()
     observer.join()
 
-def command(sequence,nomor_body,vin_no,car,steer,suffix,Kode_relay, Box_X, Box_Y, Box_Z):
+def command(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     start_time = time.time()
     print("=============================")
     print("Sequence   : " + sequence)
@@ -58,5 +66,29 @@ def command(sequence,nomor_body,vin_no,car,steer,suffix,Kode_relay, Box_X, Box_Y
     print("Suffix     : " + suffix)
     print("Kode Relay : " + Kode_relay)
     print("-----------------------------")
+    
+    # Menulis data yang sudah ditambahkan ke file coba.csv
+    data = [[sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z, "ok"]]
+    
+    time.sleep(3)
+    write_to_csv(data)
+    update_csv(data)
 
 baca_data_terbaru('baca_file_ini.csv', command)
+
+### COMMENT INI
+"""
+    sekarang = datetime.datetime.now()
+    tanggal = sekarang.strftime("%d-%m-%Y")
+    jam = sekarang.strftime("%H:%M:%S")
+   
+    if signal = 0:
+        data = [[tanggal, jam, sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z, "OK"]]
+        write_to_csv(data)
+        update_csv(data)
+    
+    else:
+        data = [[tanggal, jam, sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z, "NG"]]
+        write_to_csv(data)
+        update_csv(data) 
+        """
