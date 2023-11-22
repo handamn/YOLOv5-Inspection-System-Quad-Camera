@@ -1,9 +1,236 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Latest Images</title>
+    <title>AWOKAOWKAOWK</title>
+    <style>
+        .corner {
+            border-radius: 25px;
+            border: 5px solid #bb0202;
+            padding: 0px;
+            width:100%;
+            height:auto;
+            text-align: center;
+        }
+
+        .video-container {
+            justify-content: center;
+            text-align: center;
+            height:100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #a4a4a4;
+            padding: 10px;
+        }
+
+        .header-item {
+            flex-basis: 33.33%;
+        }
+
+        .container{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .container2{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .col{
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .col1 {
+            width: 20%;
+            background-color: #f1f1f1;
+        }
+
+        .col2 {
+            width: 20%;
+            background-color: #d3d3d3;
+        }
+
+        .col3 {
+            width: 60%;
+            background-color: #c0c0c0;
+        }
+
+        .col4{
+            width: 30%;
+            background-color: #9d9d9d;
+        }
+
+        .col5{
+            width: 70%;
+            background-color: #a3a3a3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-item">
+            <!-- Kolom pertama -->
+            <h5>Sequence</h5>
+            <h1 id="sequence">Sequence:</h1>
+        </div>
+        <div class="header-item">
+            <!-- Kolom kedua -->
+            <h7>Nomor Body:</h7>
+            <h3 id="nomor_body">Nomor Body:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom ketiga -->
+            <h7>Vin No.:</h7>
+            <h3 id="vin_no">Vin_no:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Car:</h7>
+            <h3 id="car">Car:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Steer:</h7>
+            <h3 id="steer">Steer:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Suffix:</h7>
+            <h3 id="suffix">Suffix:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Kode Relay:</h7>
+            <h3 id="Kode_relay">Kode Relay:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Box_X:</h7>
+            <h3 id="Box_X">Box X:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Box_Y:</h7>
+            <h3 id="Box_Y">Box Y:</h3>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h7>Box_Z:</h7>
+            <h3 id="Box_Z">Box Z:</h3>
+        </div>
+        <div class="header-item">
+            <h7>Status Final</h7>
+            <h3 id="stat_final">status_final:</h3>
+
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="col col1">
+            <h2>Actual :</h2>
+            
+            <h4>Image with X:</h4>
+            <img id="latest-image-x" src="" alt="Latest Image X">
+        
+            <h4>Image with Y:</h4>
+            <img id="latest-image-y" src="" alt="Latest Image Y">
+        
+            <h4>Image with Z:</h4>
+            <img id="latest-image-z" src="" alt="Latest Image Z">
+        
+        </div>
+        <div class="col col2">
+            <h2>Standard :</h2>
+
+            <h4>Image with X:</h4>
+            <img id="latest-image-x" src="" alt="Latest Image X">
+        
+            <h4>Image with Y:</h4>
+            <img id="latest-image-y" src="" alt="Latest Image Y">
+        
+            <h4>Image with Z:</h4>
+            <img id="latest-image-z" src="" alt="Latest Image Z">
+
+        </div>
+        <div class="col col3">
+            <h2>Live Cam </h2>
+            <div class="video-container">
+                <div class="corner">
+                    <img src="{{ url_for('video') }}" width="1280" height="960"></img>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container2">
+        <div class="col col4">
+            <h2>BUTTON</h2>
+            <p id="myValue">{{ value }}</p>
+            <button id="resetButton" onclick="resetValue()" style="display: none;">Reset</button>
+        </div>
+
+        <div class="col col5">
+            <h2>Tabel Kebenaran :</h2>
+
+            <table>
+                <tr>
+                    <th>BOX</th>
+                    <th>STANDARD</th>
+                    <th>ACTUAL</th>
+                    <th>STATUS</th>
+                </tr>
+                <tr>
+                    <td>X</td>
+                    <td id="ref_box_X"> ref_box_X:</td>
+                    <td id="act_box_X"> actual_box_X:</td>
+                    <td id="stat_box_X"> statuS_box_X:</td>
+                </tr>
+                <tr>
+                    <td>Y</td>
+                    <td id="ref_box_Y"> ref_box_Y:</td>
+                    <td id="act_box_Y"> actual_box_Y:</td>
+                    <td id="stat_box_Y"> statuS_box_Y:</td>
+                </tr>
+                <tr>
+                    <td>Z</td>
+                    <td id="ref_box_Z"> ref_box_Z:</td>
+                    <td id="act_box_Z"> actual_box_Z:</td>
+                    <td id="stat_box_Z"> statuS_box_Z:</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
+
         function updateLatestImages() {
             $.ajax({
                 url: '/latest_images',
@@ -32,37 +259,381 @@
             });
         }
 
-        function selectImage(image) {
-            $.ajax({
-                url: '/select_image',
-                type: 'POST',
-                dataType: 'json',
-                data: {selected_image: image},
-                success: function (data) {
-                    if (data.success) {
-                        console.log('Selected image: ' + image);
-                    }
-                }
-            });
-        }
-
         $(document).ready(function () {
             updateLatestImages();
+
+            $('#reset-button').click(function () {
+                $.ajax({
+                    url: '/reset_images',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            $('#latest-image-x').attr('src', '/uploads/menunggu.jpeg');
+                            $('#latest-image-y').attr('src', '/uploads/menunggu.jpeg');
+                            $('#latest-image-z').attr('src', '/uploads/menunggu.jpeg');
+                        }
+                    }
+                });
+            });
         });
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateValue();
+
+            // Mengatur interval pembaruan nilai setiap 1 detik
+            setInterval(updateValue, 1000);
+        });
+
+        function updateValue() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/get_value', true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var element = document.getElementById("myValue");
+                    element.innerHTML = xhr.responseText;
+
+                    var resetButton = document.getElementById("resetButton");
+                    resetButton.style.display = (parseInt(xhr.responseText) === 2) ? 'block' : 'none';
+                }
+            };
+            xhr.send();
+        }
+
+    
+
+        function resetValue() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/reset', true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var element = document.getElementById("myValue");
+                    element.innerHTML = '0';
+
+                    var resetButton = document.getElementById("resetButton");
+                    resetButton.style.display = 'none';
+                }
+            };
+            xhr.send();
+        }
+
+        function fetchData() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('sequence').innerText = data.sequence;
+                        document.getElementById('nomor_body').innerText = data.nomor_body;
+                        document.getElementById('vin_no').innerText = data.vin_no;
+                        document.getElementById('car').innerText = data.car;
+                        document.getElementById('steer').innerText = data.steer;
+                        document.getElementById('suffix').innerText = data.suffix;
+                        document.getElementById('Kode_relay').innerText = data.Kode_relay;
+                        document.getElementById('Box_X').innerText = data.Box_X;
+                        document.getElementById('Box_Y').innerText = data.Box_Y;
+                        document.getElementById('Box_Z').innerText = data.Box_Z;
+                    } else {
+                        document.getElementById('sequence').innerText = "Tidak ada data.";
+                        document.getElementById('nomor_body').innerText = "";
+                        document.getElementById('vin_no').innerText = "";
+                        document.getElementById('car').innerText = "";
+                        document.getElementById('steer').innerText = "";
+                        document.getElementById('suffix').innerText = "";
+                        document.getElementById('Kode_relay').innerText = "";
+                        document.getElementById('Box_X').innerText = "";
+                        document.getElementById('Box_Y').innerText = "";
+                        document.getElementById('Box_Z').innerText = "";
+                    }
+                });
+        }
+
+        setInterval(fetchData, 1000);
+        
     </script>
-</head>
-<body>
-    <h1>Latest Images:</h1>
-    <h2>Image with X:</h2>
-    <img id="latest-image-x" src="" alt="Latest Image X">
-    <button onclick="selectImage('x')">Select X</button>
+    <script>
+      function fetchData2(){
+          fetch('/get_sequence')
+          .then(response => response.json())
+          .then(data =>{
+            if(data){
+              document.getElementById('sequence2').innerText = "Sequence2: " + data.sequence2
+            }
+            else{
+              document.getElementById('sequence2').innerText = "heheh"
+            }
+          })
+        }
 
-    <h2>Image with Y:</h2>
-    <img id="latest-image-y" src="" alt="Latest Image Y">
-    <button onclick="selectImage('y')">Select Y</button>
+        setInterval(fetchData2, 1000)
+    </script>
 
-    <h2>Image with Z:</h2>
-    <img id="latest-image-z" src="" alt="Latest Image Z">
-    <button onclick="selectImage('z')">Select Z</button>
+    <script>
+        function fetchData3(){
+            fetch('/get_car')
+            .then(response => response.json())
+            .then(data =>{
+            if(data){
+                document.getElementById('car2').innerText = "Car2: " + data.car2
+            }
+            else{
+                document.getElementById('car2').innerText = "heheh"
+            }
+            })
+        }
+
+        setInterval(fetchData3, 1000)
+    </script>
+
+    <script>
+        function fetchData4(){
+            fetch('/get_camera')
+            .then(response => response.json())
+            .then(data =>{
+            if(data){
+                document.getElementById('camera').innerText = "Cam: " + data.camera
+            }
+            else{
+                document.getElementById('camera').innerText = "heheh"
+            }
+            })
+        }
+
+        setInterval(fetchData4, 1000)
+    </script>
+
+    <script>
+        function fetchData5(){
+            fetch('/get_steer')
+            .then(response => response.json())
+            .then(data =>{
+            if(data){
+                document.getElementById('steer2').innerText = "Steer: " + data.steer2
+            }
+            else{
+                document.getElementById('steer2').innerText = "heheh"
+            }
+            })
+        }
+
+        setInterval(fetchData5, 1000)
+    </script>
+
+    <script>
+        function fetchData6(){
+            fetch('/get_box_X')
+            .then(response => response.json())
+            .then(data =>{
+            if(data){
+                document.getElementById('box_X2').innerText = "Box_X: " + data.box_X2
+            }
+            else{
+                document.getElementById('box_X2').innerText = "heheh"
+            }
+            })
+        }
+
+        setInterval(fetchData6, 1000)
+    </script>
+
+    <script>
+        function fetchData7(){
+            fetch('/get_box_Y')
+            .then(response => response.json())
+            .then(data =>{
+            if(data){
+                document.getElementById('box_Y2').innerText = "Box_Y: " + data.box_Y2
+            }
+            else{
+                document.getElementById('box_Y2').innerText = "heheh"
+            }
+            })
+        }
+
+        setInterval(fetchData7, 1000)
+    </script>
+
+    <script>
+        function fetchData8(){
+            fetch('/get_box_Z')
+            .then(response => response.json())
+            .then(data =>{
+            if(data){
+                document.getElementById('box_Z2').innerText = "Box_Z: " + data.box_Z2
+            }
+            else{
+                document.getElementById('box_Z2').innerText = "heheh"
+            }
+            })
+        }
+
+        setInterval(fetchData8, 1000)
+    </script>
+
+    <script>
+        function fetch_reference_box_X(){
+            fetch('/get_reference_box_X')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('ref_box_X').textContent = data.ref_box_X
+                }
+                else{
+                    document.getElementById('ref_box_X').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_reference_box_X, 1000);
+    </script>    
+
+    <script>
+        function fetch_actual_box_X(){
+            fetch('/get_actual_box_X')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('act_box_X').textContent = data.act_box_X
+                }
+                else{
+                    document.getElementById('act_box_X').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_actual_box_X, 1000);
+    </script>
+
+    <script>
+        function fetch_status_box_X(){
+            fetch('/get_status_box_X')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('stat_box_X').textContent = data.stat_box_X
+                }
+                else{
+                    document.getElementById('stat_box_X').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_status_box_X, 1000);
+    </script>
+
+
+
+    <script>
+        function fetch_reference_box_Y(){
+            fetch('/get_reference_box_Y')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('ref_box_Y').textContent = data.ref_box_Y
+                }
+                else{
+                    document.getElementById('ref_box_Y').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_reference_box_Y, 1000);
+    </script>    
+
+    <script>
+        function fetch_actual_box_Y(){
+            fetch('/get_actual_box_Y')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('act_box_Y').textContent = data.act_box_Y
+                }
+                else{
+                    document.getElementById('act_box_Y').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_actual_box_Y, 1000);
+    </script>
+
+    <script>
+        function fetch_status_box_Y(){
+            fetch('/get_status_box_Y')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('stat_box_Y').textContent = data.stat_box_Y
+                }
+                else{
+                    document.getElementById('stat_box_Y').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_status_box_Y, 1000);
+    </script>
+
+
+    <script>
+        function fetch_reference_box_Z(){
+            fetch('/get_reference_box_Z')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('ref_box_Z').textContent = data.ref_box_Z
+                }
+                else{
+                    document.getElementById('ref_box_Z').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_reference_box_Z, 1000);
+    </script>    
+
+    <script>
+        function fetch_actual_box_Z(){
+            fetch('/get_actual_box_Z')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('act_box_Z').textContent = data.act_box_Z
+                }
+                else{
+                    document.getElementById('act_box_Z').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_actual_box_Z, 1000);
+    </script>
+
+    <script>
+        function fetch_status_box_Z(){
+            fetch('/get_status_box_Z')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('stat_box_Z').textContent = data.stat_box_Z
+                }
+                else{
+                    document.getElementById('stat_box_Z').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_status_box_Z, 1000);
+    </script>
+
+    <script>
+        function fetch_status_final(){
+            fetch('/get_status_final')
+            .then(response => response.json())
+            .then(data =>{
+                if(data){
+                    document.getElementById('stat_final').textContent = data.stat_final
+                }
+                else{
+                    document.getElementById('stat_final').innerText = "Menunggu"
+                }
+            })
+        }
+        setInterval(fetch_status_final, 1000);
+    </script>
+
+
 </body>
 </html>
