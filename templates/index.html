@@ -153,13 +153,13 @@
             <h2>Actual :</h2>
             
             <h4>Image with X:</h4>
-            <img id="latest-image-x2" src="" alt="Latest Image X">
+            <img id="latest-image-x" src="" alt="Latest Image X">
         
             <h4>Image with Y:</h4>
-            <img id="latest-image-y2" src="" alt="Latest Image Y">
+            <img id="latest-image-y" src="" alt="Latest Image Y">
         
             <h4>Image with Z:</h4>
-            <img id="latest-image-z2" src="" alt="Latest Image Z">
+            <img id="latest-image-z" src="" alt="Latest Image Z">
         
         </div>
         <div class="col col2">
@@ -231,6 +231,53 @@
 
     <script>
 
+        function updateLatestImages() {
+            $.ajax({
+                url: '/latest_images_standard',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.display_images.x) {
+                        $('#latest-image-x').attr('src', '/uploads/' + data.image_x);
+                    } else {
+                        $('#latest-image-x').attr('src', '/uploads/menunggu.jpeg');
+                    }
+                    if (data.display_images.y) {
+                        $('#latest-image-y').attr('src', '/uploads/' + data.image_y);
+                    } else {
+                        $('#latest-image-y').attr('src', '/uploads/menunggu.jpeg');
+                    }
+                    if (data.display_images.z) {
+                        $('#latest-image-z').attr('src', '/uploads/' + data.image_z);
+                    } else {
+                        $('#latest-image-z').attr('src', '/uploads/menunggu.jpeg');
+                    }
+                },
+                complete: function () {
+                    setTimeout(updateLatestImages, 1000);  // Memperbarui setiap 1 detik
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            updateLatestImages();
+
+            $('#reset-button').click(function () {
+                $.ajax({
+                    url: '/reset_images',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            $('#latest-image-x').attr('src', '/uploads/menunggu.jpeg');
+                            $('#latest-image-y').attr('src', '/uploads/menunggu.jpeg');
+                            $('#latest-image-z').attr('src', '/uploads/menunggu.jpeg');
+                        }
+                    }
+                });
+            });
+        });
+
         function updateLatestImages2() {
             $.ajax({
                 url: '/latest_images',
@@ -277,6 +324,7 @@
                 });
             });
         });
+
 
 
 
