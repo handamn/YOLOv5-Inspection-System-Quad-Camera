@@ -3,11 +3,18 @@
 <head>
     <title>AWOKAOWKAOWK</title>
     <style>
+
+        h1 { 
+            display: block;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
         .corner {
             border-radius: 25px;
-            border: 5px solid #bb0202;
-            padding: 0px;
-            width:100%;
+            border: 10px solid #bb0202;
+            padding: 10px;
+            width:auto;
             height:auto;
             text-align: center;
         }
@@ -22,11 +29,22 @@
             display: flex;
             justify-content: space-between;
             background-color: #a4a4a4;
-            padding: 10px;
+            border: 5px solid #000000;
         }
 
         .header-item {
             flex-basis: 33.33%;
+            border: 5px solid #000000;
+        }
+
+        .header-item-status{
+            flex-basis: 33.33%;
+            border: 5px solid #000000;
+            background-color: #e90a0a;
+        }
+
+        h1#stat_final{
+            font-size: 40px;
         }
 
         .container{
@@ -49,21 +67,37 @@
         .col1 {
             width: 20%;
             background-color: #f1f1f1;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+        }
+
+        .col1 img {
+            display: block;
+            margin: 0 auto;
         }
 
         .col2 {
             width: 20%;
             background-color: #d3d3d3;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+        }
+        .col2 img {
+            display: block;
+            margin: 0 auto;
         }
 
         .col3 {
-            width: 60%;
+            width: 55%;
             background-color: #c0c0c0;
         }
 
         .col4{
             width: 30%;
             background-color: #9d9d9d;
+            
         }
 
         .col5{
@@ -77,6 +111,7 @@
         }
 
         th, td {
+            font-size: 50px;
             padding: 8px;
             text-align: left;
             border-bottom: 1px solid #ddd;
@@ -86,63 +121,82 @@
             background-color: #f2f2f2;
         }
 
+        #resetButton {
+        font-size: 200px;
+        padding: 40px 40px;
+        border-radius: 25px;
+        border: 10px solid #000000;
+        background-color: #05d105;
+        width: 900px;
+        height: 300px;
+        font-weight: bold;
+        }
+
+        #stat_final {
+            font-size: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
     </style>
 </head>
 <body>
+    <!-- <h1 style="font-size: 60px; display: flex; justify-content: center; align-items: center;">CAMERA INSPECTION</h1> -->
     <div class="header">
         <div class="header-item">
             <!-- Kolom pertama -->
-            <h5>Sequence</h5>
-            <h2 id="sequence">Sequence:</h2>
+            <h3>Sequence</h3>
+            <h1 id="sequence", style="display: flex; justify-content: center; align-items: center;">Sequence:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom kedua -->
-            <h7>Nomor Body:</h7>
-            <h3 id="nomor_body">Nomor Body:</h3>
+            <h3>Nomor Body:</h3>
+            <h1 id="nomor_body", style="display: flex; justify-content: center; align-items: center;">Nomor Body:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom ketiga -->
-            <h7>Vin No.:</h7>
-            <h3 id="vin_no">Vin_no:</h3>
+            <h3>Vin No.:</h3>
+            <h1 id="vin_no", style="display: flex; justify-content: center; align-items: center;">Vin_no:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Car:</h7>
-            <h3 id="car">Car:</h3>
+            <h3>Car:</h3>
+            <h1 id="car", style="display: flex; justify-content: center; align-items: center;">Car:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Steer:</h7>
-            <h3 id="steer">Steer:</h3>
+            <h3>Steer:</h3>
+            <h1 id="steer", style="display: flex; justify-content: center; align-items: center;">Steer:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Suffix:</h7>
-            <h3 id="suffix">Suffix:</h3>
+            <h3>Suffix:</h3>
+            <h1 id="suffix", style="display: flex; justify-content: center; align-items: center;">Suffix:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Kode Relay:</h7>
-            <h3 id="Kode_relay">Kode Relay:</h3>
+            <h3>Kode Relay:</h3>
+            <h1 id="Kode_relay", style="display: flex; justify-content: center; align-items: center;">Kode Relay:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Box_X:</h7>
-            <h3 id="Box_X">Box X:</h3>
+            <h3>Box_X:</h3>
+            <h1 id="Box_X", style="display: flex; justify-content: center; align-items: center;">Box X:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Box_Y:</h7>
-            <h3 id="Box_Y">Box Y:</h3>
+            <h3>Box_Y:</h3>
+            <h1 id="Box_Y", style="display: flex; justify-content: center; align-items: center;">Box Y:</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
-            <h7>Box_Z:</h7>
-            <h3 id="Box_Z">Box Z:</h3>
+            <h3>Box_Z:</h3>
+            <h1 id="Box_Z", style="display: flex; justify-content: center; align-items: center;">Box Z:</h1>
         </div>
-        <div class="header-item">
-            <h7>Status Final</h7>
-            <h3 id="stat_final">status_final:</h3>
+        <div class="header-item-status">
+            <h3>Status Final</h3>
+            <h1 id="stat_final", style="display: flex; justify-content: center; align-items: center;">status_final:</h1>
 
         </div>
     </div>
@@ -150,36 +204,38 @@
 
     <div class="container">
         <div class="col col1">
-            <h2>Actual :</h2>
+
+            <h2 style="text-align: left;">Standard :</h2>
+
+            <h4 style="text-align: left;">Image with X:</h4>
+            <img id="latest-image-x2" src="" alt="Latest Image X" width="440" height="330">
+        
+            <h4 style="text-align: left;">Image with Y:</h4>
+            <img id="latest-image-y2" src="" alt="Latest Image Y" width="440" height="330">
+        
+            <h4 style="text-align: left;">Image with Z:</h4>
+            <img id="latest-image-z2" src="" alt="Latest Image Z" width="440" height="330">
             
-            <h4>Image with X:</h4>
-            <img id="latest-image-x" src="" alt="Latest Image X">
-        
-            <h4>Image with Y:</h4>
-            <img id="latest-image-y" src="" alt="Latest Image Y">
-        
-            <h4>Image with Z:</h4>
-            <img id="latest-image-z" src="" alt="Latest Image Z">
         
         </div>
         <div class="col col2">
-            <h2>Standard :</h2>
-
-            <h4>Image with X:</h4>
-            <img id="latest-image-x2" src="" alt="Latest Image X">
+            <h2 style="text-align: left;">Actual :</h2>
+            
+            <h4 style="text-align: left;">Image with X:</h4>
+            <img id="latest-image-x" src="" alt="Latest Image X" width="440" height="330">
         
-            <h4>Image with Y:</h4>
-            <img id="latest-image-y2" src="" alt="Latest Image Y">
+            <h4 style="text-align: left;">Image with Y:</h4>
+            <img id="latest-image-y" src="" alt="Latest Image Y" width="440" height="330">
         
-            <h4>Image with Z:</h4>
-            <img id="latest-image-z2" src="" alt="Latest Image Z">
+            <h4 style="text-align: left;">Image with Z:</h4>
+            <img id="latest-image-z" src="" alt="Latest Image Z" width="440" height="330">
 
         </div>
         <div class="col col3">
-            <h2>Live Cam </h2>
+            <h2 id="camera">Live Cam :</h2>
             <div class="video-container">
                 <div class="corner">
-                    <img src="{{ url_for('video') }}" width="1280" height="960"></img>
+                    <img src="{{ url_for('video') }}" width="1500" height="1125"></img>
                 </div>
             </div>
 
@@ -187,12 +243,6 @@
     </div>
 
     <div class="container2">
-        <div class="col col4">
-            <h2>BUTTON</h2>
-            <p id="myValue">{{ value }}</p>
-            <button id="resetButton" onclick="resetValue()" style="display: none;">Reset</button>
-        </div>
-
         <div class="col col5">
             <h2>Tabel Kebenaran :</h2>
 
@@ -223,6 +273,14 @@
                 </tr>
             </table>
         </div>
+        
+        <div class="col col4">
+            <h2>BUTTON</h2>
+            <button id="resetButton" onclick="resetValue()" style="display: none;">RESET</button>
+            <p id="myValue" style="color: #a3a3a3;">{{ value }}</p>
+        </div>
+
+
     </div>
 
     
@@ -440,10 +498,10 @@
             .then(response => response.json())
             .then(data =>{
             if(data){
-                document.getElementById('camera').innerText = "Cam: " + data.camera
+                document.getElementById('camera').innerText = "Live Cam : " + data.camera
             }
             else{
-                document.getElementById('camera').innerText = "heheh"
+                document.getElementById('camera').innerText = "Live Cam : Wait"
             }
             })
         }
@@ -675,7 +733,7 @@
                     document.getElementById('stat_final').textContent = data.stat_final
                 }
                 else{
-                    document.getElementById('stat_final').innerText = "Menunggu"
+                    document.getElementById('stat_final').innerText = "~"
                 }
             })
         }
