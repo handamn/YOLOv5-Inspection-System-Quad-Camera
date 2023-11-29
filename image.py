@@ -1,72 +1,101 @@
 import os
+import time
 import csv
-from flask import Flask, render_template, jsonify
-from flask_cors import CORS
+from flask import Flask, render_template, request, jsonify
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from flask import send_from_directory
+
 
 app = Flask(__name__)
-CORS(app)
+image_folder = '/home/engser/YOLO/yolov5_research2/gambar3'  # Ganti dengan path folder gambar Anda
+app.config['UPLOAD_FOLDER'] = image_folder
+app.config['LATEST_IMAGE_X'] = ''
+app.config['LATEST_IMAGE_Y'] = ''
+app.config['LATEST_IMAGE_Z'] = ''
+app.config['DISPLAY_IMAGES'] = {'x': True, 'y': True, 'z': True}
+app.config['CSV_FILE_PATH'] = 'baca_file_ini.csv'
+app.config['CSV_FILE_LAST_MODIFIED'] = 0
+app.config['SELECTED_IMAGES'] = {'x': 'a1.jpg', 'y': 'b1.jpg', 'z': 'c1.jpg'}
 
-# Mendapatkan daftar nama file gambar dari folder "gambar3" dan mengurutkannya secara alfabetis
-image_folder = "static/gambar3"
-image_files = sorted([f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))])
 
-# Menghitung jumlah gambar
-num_images = len(image_files)
+class ImageHandler(FileSystemEventHandler):
+    def on_created(self, event):
+        if event.is_directory:
+            return
+        filename, extension = os.path.splitext(event.src_path)
+        if extension.lower() in ['.jpg', '.jpeg', '.png', '.gif']:
+            if 'X' in os.path.basename(event.src_path):
+                app.config['LATEST_IMAGE_X'] = os.path.basename(event.src_path)
+                app.config['DISPLAY_IMAGES']['x'] = True
+            if 'Y' in os.path.basename(event.src_path):
+                app.config['LATEST_IMAGE_Y'] = os.path.basename(event.src_path)
+                app.config['DISPLAY_IMAGES']['y'] = True
+            if 'Z' in os.path.basename(event.src_path):
+                app.config['LATEST_IMAGE_Z'] = os.path.basename(event.src_path)
+                app.config['DISPLAY_IMAGES']['z'] = True
 
-# Menginisialisasi variabel index gambar
-current_image_index = 0
-
-# Fungsi untuk membaca data dari file CSV
-def read_csv_data():
-    csv_file = "baca_file_ini.csv"
-
-    with open(csv_file, "r") as file:
-        csv_reader = csv.reader(file)
-        for row in csv_reader:
-            data = row[0]  # Anggap data berada di kolom pertama (index 0)
-            return data
-
-# Fungsi untuk mengubah gambar
-def change_image():
-    global current_image_index
-    current_image_index = (current_image_index + 1) % num_images
-
-# Watchdog event handler
-class FileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        if event.src_path == "./baca_file_ini.csv":
-            data = read_csv_data()
-            if data is not None:
-                change_image()
+        if event.is_directory or event.src_path != app.config['CSV_FILE_PATH']:
+            return
 
-# Membuat objek Observer dan menghubungkannya dengan event handler
-observer = Observer()
-event_handler = FileChangeHandler()
-observer.schedule(event_handler, path="./", recursive=False)
-observer.start()
+        file_modified_time = os.path.getmtime(app.config['CSV_FILE_PATH'])
+        if file_modified_time > app.config['CSV_FILE_LAST_MODIFIED']:
+            app.config['CSV_FILE_LAST_MODIFIED'] = file_modified_time
+            reset_images()
 
-@app.route("/")
+
+def get_latest_images():
+    latest_image_x = app.config.get('LATEST_IMAGE_X', '')
+    latest_image_y = app.config.get('LATEST_IMAGE_Y', '')
+    latest_image_z = app.config.get('LATEST_IMAGE_Z', '')
+    return latest_image_x, latest_image_y, latest_image_z
+
+
+def reset_images():
+    app.config['DISPLAY_IMAGES'] = {'x': False, 'y': False, 'z': False}
+
+
+def check_csv_changes():
+    csv_file_path = app.config['CSV_FILE_PATH']
+    last_modified = app.config['CSV_FILE_LAST_MODIFIED']
+    file_modified_time = os.path.getmtime(csv_file_path)
+
+    if file_modified_time > last_modified:
+        app.config['CSV_FILE_LAST_MODIFIED'] = file_modified_time
+        reset_images()
+
+
+@app.route('/')
 def index():
-    # Mendapatkan nama file gambar saat ini
-    current_image = image_files[current_image_index]
-
-    # Mengirimkan nama file gambar ke template HTML
-    return render_template("index5.html", image_path="gambar3/" + current_image)
-
-@app.route("/update_image", methods=["GET"])
-def update_image():
-    # Mendapatkan nama file gambar saat ini
-    current_image = image_files[current_image_index]
-
-    # Mengirimkan nama file gambar dalam bentuk JSON
-    return jsonify({"image_path": "gambar3/" + current_image})
+    return render_template('index4.html')
 
 
-if __name__ == "__main__":
+@app.route('/latest_images')
+def latest_images():
+    check_csv_changes()
+    latest_image_x, latest_image_y, latest_image_z = get_latest_images()
+    display_images = app.config.get('DISPLAY_IMAGES', {'x': False, 'y': False, 'z': False})
+    return jsonify({'image_x': latest_image_x, 'image_y': latest_image_y, 'image_z': latest_image_z, 'display_images': display_images})
+
+
+@app.route('/select_image', methods=['POST'])
+def select_image():
+    selected_image = request.form.get('selected_image', '')
+    if selected_image and selected_image in ['x', 'y', 'z']:
+        app.config['SELECTED_IMAGES'][selected_image] = selected_image
+        return jsonify({'success': True})
+    return jsonify({'success': False})
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+if __name__ == '__main__':
+    event_handler = ImageHandler()
+    observer = Observer()
+    observer.schedule(event_handler, path=image_folder, recursive=False)
+    observer.start()
     app.run(debug=True, port=9000)
-    observer.stop()
-    observer.join()
-
-
