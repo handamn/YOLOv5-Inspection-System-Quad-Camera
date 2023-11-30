@@ -179,6 +179,10 @@ def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Bo
         'Box_Y': Box_Y,
         'Box_Z': Box_Z
     }
+    #data = [[sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z, "ok"]]
+    
+    #write_new_line_to_csv(data)
+    #update_continue_csv(data)
 
 
 def handle_sequence(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
@@ -300,7 +304,6 @@ def custom_model3():
 def crop(img, bbox, final_name):
     # Mendapatkan waktu saat ini
     now = datetime.datetime.now()
-    tanggal = now.strftime("%d-%m-%Y")
 
     # Mendapatkan jam, menit, dan detik
     hour = str(now.hour)
@@ -332,7 +335,7 @@ def crop(img, bbox, final_name):
     enhanced_img = resized_img.filter(ImageFilter.UnsharpMask(radius=3, percent=180, threshold=3))
 
     # Save the cropped image as a screenshot
-    save_name = path_gambar + tanggal + "_" + hour + ":" + minute + ":" + second + "_" + final_name
+    save_name = path_gambar + hour + ":" + minute + ":" + second + "_" + final_name
     
     #cropped_img.save(path_gambar+ hour + minute + second +"screenshotX.jpg")
     enhanced_img.save(save_name+ ".jpg")
@@ -341,7 +344,6 @@ def crop(img, bbox, final_name):
 def crop2(img, final_name):
     # Mendapatkan waktu saat ini
     now = datetime.datetime.now()
-    tanggal = now.strftime("%d-%m-%Y")
 
     # Mendapatkan jam, menit, dan detik
     hour = str(now.hour)
@@ -352,7 +354,7 @@ def crop2(img, final_name):
     resized_img = screen_img.resize((320,240), Image.LANCZOS)
 
     # Save the cropped image as a screenshot
-    save_name = path_gambar + tanggal + "_" + hour + ":" + minute + ":" + second + "_" + final_name
+    save_name = path_gambar + hour + ":" + minute + ":" + second + "_" + final_name
     
     resized_img.save(save_name+ ".jpg")
 
@@ -912,8 +914,6 @@ def gen_tunggu(camera):
     tanggal = sekarang.strftime("%d-%m-%Y")
     jam = sekarang.strftime("%H:%M:%S")
 
-    pesan_kosong = "No Camera"
-
 
     a = get_box_Z2()
     b = get_car2()
@@ -931,7 +931,7 @@ def gen_tunggu(camera):
                 'stat_final' : "OK"
             }
             kondisi_reset = 0
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1,remove_array(actual_box_X), remove_array(status_box_X), pesan_kosong, pesan_kosong, remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
+            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1,remove_array(actual_box_X), remove_array(status_box_X), remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
             write_new_line_to_csv(data, file_plc)
             update_continue_csv(data, file_report)
 
@@ -940,7 +940,7 @@ def gen_tunggu(camera):
                 'stat_final' : "NG"
             }
             kondisi_reset = 2
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1, remove_array(actual_box_X), remove_array(status_box_X), pesan_kosong, pesan_kosong, remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
+            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1, remove_array(actual_box_X), remove_array(status_box_X), remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
             write_new_line_to_csv(data, file_plc)
             update_continue_csv(data, file_report)
 
@@ -1765,7 +1765,7 @@ def check_csv_changes2():
 
 @app.route('/')
 def index():
-    return render_template('index_copy7.html')
+    return render_template('index_copy6.html')
 
 @app.route('/get_data')
 def get_data():
