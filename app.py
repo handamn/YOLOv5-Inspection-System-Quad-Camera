@@ -886,8 +886,7 @@ def gen3(camera):
 
 def gen_tunggu(camera):
 
-    global data_camera
-
+    
     global reference_box_X
     global actual_box_X
     global status_box_X
@@ -920,10 +919,6 @@ def gen_tunggu(camera):
     c = get_steer2()
     mobil = b + '_' + c
     stir = data_steer
-
-    data_camera = {
-        'camera' : list_scene[5]['sceneName']
-    }
 
     if mobil == "Innova_RHD":
         if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Z)=="OK"):
@@ -1004,8 +999,6 @@ def gen_tunggu(camera):
 def generate_frames():
     cameraa = camera1
 
-    global data_camera
-
     global reference_box_X
     global actual_box_X
     global status_box_X
@@ -1070,11 +1063,6 @@ def generate_frames():
                         mode_1  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        
-                        data_camera = {
-                            'camera' : list_scene[cycle_1]['sceneName']
-                        }
-
                         if mode_1 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1115,10 +1103,6 @@ def generate_frames():
                         mode_2  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_2]['sceneName']
-                        }
-                        
                         if mode_2 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1159,11 +1143,6 @@ def generate_frames():
                         mode_3  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        
-                        data_camera = {
-                            'camera' : list_scene[cycle_3]['sceneName']
-                        }
-                        
                         if mode_3 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1207,10 +1186,6 @@ def generate_frames():
                         mode_1  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_1]['sceneName']
-                        }
-                        
                         if mode_1 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1251,10 +1226,6 @@ def generate_frames():
                         mode_2  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_2]['sceneName']
-                        }
-                        
                         if mode_2 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1295,10 +1266,6 @@ def generate_frames():
                         mode_3  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_3]['sceneName']
-                        }
-
                         if mode_3 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1342,10 +1309,6 @@ def generate_frames():
                         mode_1  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_1]['sceneName']
-                        }
-                        
                         if mode_1 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1386,10 +1349,6 @@ def generate_frames():
                         mode_2  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_2]['sceneName']
-                        }
-                        
                         if mode_2 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1430,10 +1389,6 @@ def generate_frames():
                         mode_3  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_3]['sceneName']
-                        }
-                        
                         if mode_3 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1477,10 +1432,6 @@ def generate_frames():
                         mode_1  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_1]['sceneName']
-                        }
-                        
                         if mode_1 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1521,10 +1472,6 @@ def generate_frames():
                         mode_2  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_2]['sceneName']
-                        }
-                        
                         if mode_2 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1565,10 +1512,6 @@ def generate_frames():
                         mode_3  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0])
 
                         ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        data_camera = {
-                            'camera' : list_scene[cycle_3]['sceneName']
-                        }
-                        
                         if mode_3 == 'gen':
                             for frame in gen(cameraa):
                                 yield frame
@@ -1765,7 +1708,7 @@ def check_csv_changes2():
 
 @app.route('/')
 def index():
-    return render_template('index_copy6.html')
+    return render_template('index_copy5.html')
 
 @app.route('/get_data')
 def get_data():
