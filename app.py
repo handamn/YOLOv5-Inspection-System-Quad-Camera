@@ -1,19 +1,17 @@
-import os
 import datetime
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import csv
-from flask import Flask, render_template, jsonify, Response, request
+from flask import Flask, render_template, jsonify, Response
 import io
 import cv2
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 import torch
 from obswebsocket import obsws, requests
 from obswebsocket.exceptions import ConnectionFailure
 import pandas as pd
-from flask import send_from_directory
 
 camera1 = cv2.VideoCapture(0)
 
@@ -74,7 +72,8 @@ urutan_kamera = 'urutan_kamera.csv'
 
 none_stat = "BELUM_TERDETEKSI"
 
-path_gambar = '/home/engser/YOLO/yolov5_research2/gambar/'
+
+
 
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -301,82 +300,12 @@ def custom_model3():
     
     return model2
 
-def crop(img, bbox, final_name):
-    # Mendapatkan waktu saat ini
-    now = datetime.datetime.now()
-
-    # Mendapatkan jam, menit, dan detik
-    hour = str(now.hour)
-    minute = str(now.minute)
-    second = str(now.second)
-
-    # Crop the image using the bounding box coordinates
-    cropped_img = Image.fromarray(img).crop((bbox[0], bbox[1], bbox[2], bbox[3]))
-
-    # Calculate the new size while maintaining the aspect ratio
-    width, height = cropped_img.size
-    max_w = 320
-    max_h = 240
-
-    # Menentukan faktor perubahan ukuran
-    width_ratio = max_w / width
-    height_ratio = max_h / height
-    resize_ratio = min(width_ratio, height_ratio)
-
-    # Menghitung ukuran baru
-    new_width = int(width * resize_ratio)
-    new_height = int(height * resize_ratio)
-
-    
-    # Resize the image while maintaining the aspect ratio
-    resized_img = cropped_img.resize((new_width, new_height), Image.LANCZOS)
-
-    # Enhance the sharpness of the resized image
-    enhanced_img = resized_img.filter(ImageFilter.UnsharpMask(radius=3, percent=180, threshold=3))
-
-    # Save the cropped image as a screenshot
-    save_name = path_gambar + hour + ":" + minute + ":" + second + "_" + final_name
-    
-    #cropped_img.save(path_gambar+ hour + minute + second +"screenshotX.jpg")
-    enhanced_img.save(save_name+ ".jpg")
-    print("Screenshot saved!")
-
-def crop2(img, final_name):
-    # Mendapatkan waktu saat ini
-    now = datetime.datetime.now()
-
-    # Mendapatkan jam, menit, dan detik
-    hour = str(now.hour)
-    minute = str(now.minute)
-    second = str(now.second)
-
-    screen_img = Image.fromarray(img)
-    resized_img = screen_img.resize((320,240), Image.LANCZOS)
-
-    # Save the cropped image as a screenshot
-    save_name = path_gambar + hour + ":" + minute + ":" + second + "_" + final_name
-    
-    resized_img.save(save_name+ ".jpg")
-
 
 
 def gen(camera):
     global reference_box_X
     global actual_box_X
     global status_box_X
-
-    global latest_data
-
-    sequence1 = latest_data ['sequence']
-    body_no1 = latest_data ['nomor_body']
-    vin_no1 = latest_data ['vin_no']
-    car1 = latest_data ['car']
-    steering1 = latest_data ['steer']
-    suffix1 = latest_data ['suffix']
-    relay1 = latest_data ['Kode_relay']
-    box_X1 = latest_data ['Box_X']
-
-    file_name = sequence1 + '_' + body_no1 + '_' + vin_no1 + '_' + car1 + '_' + steering1 + '_' + suffix1 + '_' + relay1 + '_'
 
     reference_box_X = None
     actual_box_X = None
@@ -388,12 +317,14 @@ def gen(camera):
         'ref_box_X' : temp_reference_box_X
     }
 
+    
     model = custom_model()
     df_array = [] # Array untuk menyimpan hasil df
     af_array = []
 
     while True:
         success, frame = camera.read()
+
 
         if success:
             ret, buffer = cv2.imencode('.jpg', frame)
@@ -429,16 +360,9 @@ def gen(camera):
                         status_box_X = {
                             'stat_box_X' : none_stat
                         }
-
-                        final_name = file_name + "JB_X_" +box_X1 + "_" +"NG"
-                        crop2(img, final_name) 
-
                         break
 
                 else:
-                    bbox = results.pandas().xyxy[0][['xmin', 'ymin', 'xmax', 'ymax']].values[0]
-                    bbox = bbox.astype(int)  
-
                     df = results.pandas().xyxy[0]['name']
                     ef = df.to_string()
                     ef = ef.split()[1]
@@ -472,16 +396,10 @@ def gen(camera):
                                 status_box_X = {
                                     'stat_box_X' : "OK"
                                 }
-                                final_name = file_name + "JB_X_" + ef + "_" +"OK"
-                                crop(img, bbox, final_name)
-
                             else :
                                 status_box_X = {
                                     'stat_box_X' : "NG"
                                 }
-                                final_name = file_name + "JB_X_" + box_X1 + "_" +"NG"
-                                crop(img, bbox, final_name)
-                            
 
                             break
                             
@@ -493,8 +411,7 @@ def gen(camera):
                             status_box_X = {
                                 'stat_box_X' : "NG"
                             }
-                            final_name = file_name + "JB_X_" + box_X1 + "_" +"NG"
-                            crop(img, bbox, final_name)                            
+                            
 
                             print("================================")
                             print("================================")
@@ -502,6 +419,9 @@ def gen(camera):
                             print("================================")
                             break
                     
+                            
+                    
+
             else:
                 ymin = 0
                 ymax = 0
@@ -528,9 +448,6 @@ def gen(camera):
                     status_box_X = {
                         'stat_box_X' : none_stat
                     }
-                    final_name = file_name + "JB_X_" + box_X1 + "_" +"NG"
-                    crop2(img, final_name)
-
                     break
 
         else:
@@ -540,19 +457,6 @@ def gen2(camera):
     global reference_box_Y
     global actual_box_Y
     global status_box_Y
-
-    global latest_data
-
-    sequence1 = latest_data ['sequence']
-    body_no1 = latest_data ['nomor_body']
-    vin_no1 = latest_data ['vin_no']
-    car1 = latest_data ['car']
-    steering1 = latest_data ['steer']
-    suffix1 = latest_data ['suffix']
-    relay1 = latest_data ['Kode_relay']
-    box_Y1 = latest_data ['Box_Y']
-
-    file_name = sequence1 + '_' + body_no1 + '_' + vin_no1 + '_' + car1 + '_' + steering1 + '_' + suffix1 + '_' + relay1 + '_'
 
     reference_box_Y = None
     actual_box_Y = None
@@ -606,16 +510,10 @@ def gen2(camera):
                         status_box_Y = {
                             'stat_box_Y' : none_stat
                         }
-
-                        final_name = file_name + "JB_Y_" + box_Y1 + "_" +"NG"
-                        crop2(img, final_name) 
-
                         break
 
-                else:
-                    bbox = results.pandas().xyxy[0][['xmin', 'ymin', 'xmax', 'ymax']].values[0]
-                    bbox = bbox.astype(int)  
 
+                else:
                     df = results.pandas().xyxy[0]['name']
                     ef = df.to_string()
                     ef = ef.split()[1]
@@ -648,14 +546,10 @@ def gen2(camera):
                                 status_box_Y = {
                                     'stat_box_Y' : "OK"
                                 }
-                                final_name = file_name + "JB_Y_" + ef + "_" +"OK"
-                                crop(img, bbox, final_name)                                
                             else:
                                 status_box_Y = {
                                     'stat_box_Y' : "NG"
                                 }
-                                final_name = file_name + "JB_Y_" + box_Y1 + "_" +"NG"
-                                crop(img, bbox, final_name)
 
                             break
                     
@@ -667,8 +561,6 @@ def gen2(camera):
                             status_box_Y = {
                                 'stat_box_Y' : "NG"
                             }
-                            final_name = file_name + "JB_Y_" + box_Y1 + "_" +"NG"
-                            crop(img, bbox, final_name)
 
                             print("================================")
                             print("================================")
@@ -701,10 +593,6 @@ def gen2(camera):
                     status_box_Y = {
                         'stat_box_Y' : none_stat
                     }
-
-                    final_name = file_name + "JB_Y_" + box_Y1 + "_" +"NG"
-                    crop2(img, final_name)   
-
                     break
 
         else:
@@ -714,19 +602,6 @@ def gen3(camera):
     global reference_box_Z
     global actual_box_Z
     global status_box_Z
-
-    global latest_data
-
-    sequence1 = latest_data ['sequence']
-    body_no1 = latest_data ['nomor_body']
-    vin_no1 = latest_data ['vin_no']
-    car1 = latest_data ['car']
-    steering1 = latest_data ['steer']
-    suffix1 = latest_data ['suffix']
-    relay1 = latest_data ['Kode_relay']
-    box_Z1 = latest_data ['Box_Z']
-
-    file_name = sequence1 + '_' + body_no1 + '_' + vin_no1 + '_' + car1 + '_' + steering1 + '_' + suffix1 + '_' + relay1 + '_'
 
     reference_box_Z = None
     actual_box_Z = None
@@ -780,16 +655,9 @@ def gen3(camera):
                         status_box_Z = {
                             'stat_box_Z' : none_stat
                         }
-
-                        final_name = file_name +  "JB_Z_" + box_Z1 + "_" +"NG"
-                        crop2(img, final_name)   
-
                         break
 
                 else:
-                    bbox = results.pandas().xyxy[0][['xmin', 'ymin', 'xmax', 'ymax']].values[0]
-                    bbox = bbox.astype(int)  
-
                     df = results.pandas().xyxy[0]['name']
                     ef = df.to_string()
                     ef = ef.split()[1]
@@ -822,14 +690,10 @@ def gen3(camera):
                                 status_box_Z = {
                                     'stat_box_Z' : "OK"
                                 }
-                                final_name = file_name + "JB_Z_" + ef + "_" +"OK"
-                                crop(img, bbox, final_name)
                             else :
                                 status_box_Z = {
                                     'stat_box_Z' : "NG"
                                 }
-                                final_name = file_name + "JB_Z_" + box_Z1 + "_" +"NG"
-                                crop(img, bbox, final_name)
 
                             break
                     else:
@@ -840,8 +704,6 @@ def gen3(camera):
                             status_box_Z = {
                                 'stat_box_Z' : "NG"
                             }
-                            final_name = file_name + "JB_Z_" + box_Z1 + "_" +"NG"
-                            crop(img, bbox, final_name)
 
                             print("================================")
                             print("================================")
@@ -875,10 +737,6 @@ def gen3(camera):
                     status_box_Z = {
                         'stat_box_Z' : none_stat
                     }
-
-                    final_name = file_name + "JB_Z_" +box_Z1 + "_" +"NG"
-                    crop2(img, final_name)
-                    
                     break
 
         else:
@@ -1559,70 +1417,12 @@ def generate_frames():
                     if data_seq != previous_data_seq:
                         break
                 pass
-
-########################################
-image_folder = '/home/engser/YOLO/yolov5_research2/gambar'  # Ganti dengan path folder gambar Anda
-app.config['UPLOAD_FOLDER'] = image_folder
-app.config['LATEST_IMAGE_X'] = ''
-app.config['LATEST_IMAGE_Y'] = ''
-app.config['LATEST_IMAGE_Z'] = ''
-app.config['DISPLAY_IMAGES'] = {'x': True, 'y': True, 'z': True}
-app.config['CSV_FILE_PATH'] = 'baca_file_ini.csv'
-app.config['CSV_FILE_LAST_MODIFIED'] = 0
-
-
-class ImageHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        if event.is_directory:
-            return
-        filename, extension = os.path.splitext(event.src_path)
-        if extension.lower() in ['.jpg', '.jpeg', '.png', '.gif']:
-            if 'X' in os.path.basename(event.src_path):
-                app.config['LATEST_IMAGE_X'] = os.path.basename(event.src_path)
-                app.config['DISPLAY_IMAGES']['x'] = True
-            if 'Y' in os.path.basename(event.src_path):
-                app.config['LATEST_IMAGE_Y'] = os.path.basename(event.src_path)
-                app.config['DISPLAY_IMAGES']['y'] = True
-            if 'Z' in os.path.basename(event.src_path):
-                app.config['LATEST_IMAGE_Z'] = os.path.basename(event.src_path)
-                app.config['DISPLAY_IMAGES']['z'] = True
-
-    def on_modified(self, event):
-        if event.is_directory or event.src_path != app.config['CSV_FILE_PATH']:
-            return
-
-        file_modified_time = os.path.getmtime(app.config['CSV_FILE_PATH'])
-        if file_modified_time > app.config['CSV_FILE_LAST_MODIFIED']:
-            app.config['CSV_FILE_LAST_MODIFIED'] = file_modified_time
-            reset_images()
-
-
-def get_latest_images():
-    latest_image_x = app.config.get('LATEST_IMAGE_X', '')
-    latest_image_y = app.config.get('LATEST_IMAGE_Y', '')
-    latest_image_z = app.config.get('LATEST_IMAGE_Z', '')
-    return latest_image_x, latest_image_y, latest_image_z
-
-
-def reset_images():
-    app.config['DISPLAY_IMAGES'] = {'x': False, 'y': False, 'z': False}
-
-
-def check_csv_changes():
-    csv_file_path = app.config['CSV_FILE_PATH']
-    last_modified = app.config['CSV_FILE_LAST_MODIFIED']
-    file_modified_time = os.path.getmtime(csv_file_path)
-
-    if file_modified_time > last_modified:
-        app.config['CSV_FILE_LAST_MODIFIED'] = file_modified_time
-        reset_images()
-
-########################################                   
+                   
 
 
 @app.route('/')
 def index():
-    return render_template('index_copy.html')
+    return render_template('index.html')
 
 @app.route('/get_data')
 def get_data():
@@ -1741,21 +1541,6 @@ def get_status_final():
     global status_final
     return jsonify(status_final)
 
-#######################################
-
-@app.route('/latest_images_standard')
-def latest_images_standard():
-    check_csv_changes()
-    latest_image_x, latest_image_y, latest_image_z = get_latest_images()
-    display_images = app.config.get('DISPLAY_IMAGES', {'x': False, 'y': False, 'z': False})
-    return jsonify({'image_x': latest_image_x, 'image_y': latest_image_y, 'image_z': latest_image_z, 'display_images': display_images})
-
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-#####################################
 
 
 @app.route('/video')
@@ -1771,7 +1556,7 @@ if __name__ == "__main__":
     event_handler6 = FileChangeHandler('baca_file_ini.csv', handle_box_X)
     event_handler7 = FileChangeHandler('baca_file_ini.csv', handle_box_Y)
     event_handler8 = FileChangeHandler('baca_file_ini.csv', handle_box_Z)
-    event_handler9 = ImageHandler()
+
 
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
@@ -1782,7 +1567,6 @@ if __name__ == "__main__":
     observer.schedule(event_handler6, path='.', recursive=False)
     observer.schedule(event_handler7, path='.', recursive=False)
     observer.schedule(event_handler8, path='.', recursive=False)
-    observer.schedule(event_handler9, path=image_folder, recursive=False)
 
     observer.start()
 
