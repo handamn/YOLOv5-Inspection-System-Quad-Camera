@@ -28,7 +28,6 @@ scenes = ws.call(requests.GetSceneList())
 list_scene = scenes.getScenes()
 
 path_model ="/home/engser/YOLO/yolov5_research2/model_custom/"
-path_standard_image = "/home/engser/YOLO/yolov5_research2/gambar3"
 
 
 
@@ -338,6 +337,7 @@ def crop(img, bbox, final_name):
     # Save the cropped image as a screenshot
     save_name = path_gambar + hour + ":" + minute + ":" + second + "_" + final_name
     
+    #cropped_img.save(path_gambar+ hour + minute + second +"screenshotX.jpg")
     enhanced_img.save(save_name+ ".jpg")
     print("Screenshot saved!")
 
@@ -1561,91 +1561,68 @@ def generate_frames():
                 pass
 
 ########################################
-image_folder2 = '/home/engser/YOLO/yolov5_research2/gambar'  # Ganti dengan path folder gambar Anda
-app.config['UPLOAD_FOLDER2'] = "/home/engser/YOLO/yolov5_research2/gambar3"
-app.config['LATEST_IMAGE_X2'] = ''
-app.config['LATEST_IMAGE_Y2'] = ''
-app.config['LATEST_IMAGE_Z2'] = ''
-app.config['DISPLAY_IMAGES2'] = {'x2': True, 'y2': True, 'z2': True}
-app.config['CSV_FILE_PATH2'] = 'baca_file_ini.csv'
-app.config['CSV_FILE_LAST_MODIFIED2'] = 0
+image_folder = '/home/engser/YOLO/yolov5_research2/gambar'  # Ganti dengan path folder gambar Anda
+app.config['UPLOAD_FOLDER'] = image_folder
+app.config['LATEST_IMAGE_X'] = ''
+app.config['LATEST_IMAGE_Y'] = ''
+app.config['LATEST_IMAGE_Z'] = ''
+app.config['DISPLAY_IMAGES'] = {'x': True, 'y': True, 'z': True}
+app.config['CSV_FILE_PATH'] = 'baca_file_ini.csv'
+app.config['CSV_FILE_LAST_MODIFIED'] = 0
 
-wkwk = "0_BLANK.jpg"
 
-class ImageHandler2(FileSystemEventHandler):
+class ImageHandler(FileSystemEventHandler):
     def on_created(self, event):
         if event.is_directory:
             return
-        filename2, extension = os.path.splitext(event.src_path)
+        filename, extension = os.path.splitext(event.src_path)
         if extension.lower() in ['.jpg', '.jpeg', '.png', '.gif']:
             if 'X' in os.path.basename(event.src_path):
-                a = get_box_X2()
-                b = get_car2()
-                c = get_steer2()
-                mobil = b + '_' + c
-
-                app.config['UPLOAD_FOLDER2'] = path_standard_image + "/" + mobil + "/Box1"
-                app.config['LATEST_IMAGE_X2'] = a + ".jpg"
-                app.config['DISPLAY_IMAGES2']['x2'] = True
-
+                app.config['LATEST_IMAGE_X'] = os.path.basename(event.src_path)
+                app.config['DISPLAY_IMAGES']['x'] = True
             if 'Y' in os.path.basename(event.src_path):
-                a = get_box_Y2()
-                b = get_car2()
-                c = get_steer2()
-                mobil = b + '_' + c
-
-                app.config['UPLOAD_FOLDER2'] = path_standard_image + "/" + mobil + "/Box2"
-                app.config['LATEST_IMAGE_Y2'] = a + ".jpg"
-
-                print(path_standard_image + "/" + mobil + "/Box2")
-                print
-                app.config['DISPLAY_IMAGES2']['y2'] = True
+                app.config['LATEST_IMAGE_Y'] = os.path.basename(event.src_path)
+                app.config['DISPLAY_IMAGES']['y'] = True
             if 'Z' in os.path.basename(event.src_path):
-                a = get_box_Z2()
-                b = get_car2()
-                c = get_steer2()
-                mobil = b + '_' + c
-
-                app.config['UPLOAD_FOLDER2'] = path_standard_image + "/" + mobil + "/Box3"
-                app.config['LATEST_IMAGE_Z2'] = a + ".jpg"
-                app.config['DISPLAY_IMAGES2']['z2'] = True
+                app.config['LATEST_IMAGE_Z'] = os.path.basename(event.src_path)
+                app.config['DISPLAY_IMAGES']['z'] = True
 
     def on_modified(self, event):
-        if event.is_directory or event.src_path != app.config['CSV_FILE_PATH2']:
+        if event.is_directory or event.src_path != app.config['CSV_FILE_PATH']:
             return
 
-        file_modified_time = os.path.getmtime(app.config['CSV_FILE_PATH2'])
-        if file_modified_time > app.config['CSV_FILE_LAST_MODIFIED2']:
-            app.config['CSV_FILE_LAST_MODIFIED2'] = file_modified_time
-            reset_images2()
+        file_modified_time = os.path.getmtime(app.config['CSV_FILE_PATH'])
+        if file_modified_time > app.config['CSV_FILE_LAST_MODIFIED']:
+            app.config['CSV_FILE_LAST_MODIFIED'] = file_modified_time
+            reset_images()
 
 
-def get_latest_images2():
-    latest_image_x2 = app.config.get('LATEST_IMAGE_X2', '')
-    latest_image_y2 = app.config.get('LATEST_IMAGE_Y2', '')
-    latest_image_z2 = app.config.get('LATEST_IMAGE_Z2', '')
-    return latest_image_x2, latest_image_y2, latest_image_z2
+def get_latest_images():
+    latest_image_x = app.config.get('LATEST_IMAGE_X', '')
+    latest_image_y = app.config.get('LATEST_IMAGE_Y', '')
+    latest_image_z = app.config.get('LATEST_IMAGE_Z', '')
+    return latest_image_x, latest_image_y, latest_image_z
 
 
-def reset_images2():
-    app.config['DISPLAY_IMAGES2'] = {'x2': False, 'y2': False, 'z2': False}
+def reset_images():
+    app.config['DISPLAY_IMAGES'] = {'x': False, 'y': False, 'z': False}
 
 
-def check_csv_changes2():
-    csv_file_path = app.config['CSV_FILE_PATH2']
-    last_modified = app.config['CSV_FILE_LAST_MODIFIED2']
+def check_csv_changes():
+    csv_file_path = app.config['CSV_FILE_PATH']
+    last_modified = app.config['CSV_FILE_LAST_MODIFIED']
     file_modified_time = os.path.getmtime(csv_file_path)
 
     if file_modified_time > last_modified:
-        app.config['CSV_FILE_LAST_MODIFIED2'] = file_modified_time
-        reset_images2()
+        app.config['CSV_FILE_LAST_MODIFIED'] = file_modified_time
+        reset_images()
 
 ########################################                   
 
 
 @app.route('/')
 def index():
-    return render_template('index_copy2.html')
+    return render_template('index_copy.html')
 
 @app.route('/get_data')
 def get_data():
@@ -1766,17 +1743,17 @@ def get_status_final():
 
 #######################################
 
-@app.route('/latest_images')
-def latest_images():
-    check_csv_changes2()
-    latest_image_x2, latest_image_y2, latest_image_z2 = get_latest_images2()
-    display_images = app.config.get('DISPLAY_IMAGES2', {'x2': False, 'y2': False, 'z2': False})
-    return jsonify({'image_x2': latest_image_x2, 'image_y2': latest_image_y2, 'image_z2': latest_image_z2, 'display_images': display_images})
+@app.route('/latest_images_standard')
+def latest_images_standard():
+    check_csv_changes()
+    latest_image_x, latest_image_y, latest_image_z = get_latest_images()
+    display_images = app.config.get('DISPLAY_IMAGES', {'x': False, 'y': False, 'z': False})
+    return jsonify({'image_x': latest_image_x, 'image_y': latest_image_y, 'image_z': latest_image_z, 'display_images': display_images})
 
 
-@app.route('/uploads2/<filename2>')
-def uploaded_file2(filename2):
-    return send_from_directory(app.config['UPLOAD_FOLDER2'], filename2)
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 #####################################
 
@@ -1794,7 +1771,7 @@ if __name__ == "__main__":
     event_handler6 = FileChangeHandler('baca_file_ini.csv', handle_box_X)
     event_handler7 = FileChangeHandler('baca_file_ini.csv', handle_box_Y)
     event_handler8 = FileChangeHandler('baca_file_ini.csv', handle_box_Z)
-    event_handler9 = ImageHandler2()
+    event_handler9 = ImageHandler()
 
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
@@ -1805,7 +1782,7 @@ if __name__ == "__main__":
     observer.schedule(event_handler6, path='.', recursive=False)
     observer.schedule(event_handler7, path='.', recursive=False)
     observer.schedule(event_handler8, path='.', recursive=False)
-    observer.schedule(event_handler9, path=image_folder2, recursive=False)
+    observer.schedule(event_handler9, path=image_folder, recursive=False)
 
     observer.start()
 
