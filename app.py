@@ -38,8 +38,6 @@ kuota_benar = 50
 kuota_salah = 50
 kuota_belum = 100
 
-list_kamera = [0,1,2,3]
-
 latest_data = None
 data_seq = None
 data_car = None
@@ -68,11 +66,8 @@ kondisi_reset = 0
 
 file_plc = 'file_plc.csv'
 file_report = 'file_report.csv'
-urutan_kamera = 'urutan_kamera.csv'
 
 none_stat = "BELUM_TERDETEKSI"
-
-
 
 
 
@@ -149,6 +144,7 @@ def update_continue_csv(data, dokumen):
         writer = csv.writer(output_file)
         writer.writerows(data)
 
+
 def tambah_data(data, dokumen):
     with open(dokumen, 'r', newline='') as file_csv:
         reader = csv.reader(file_csv)
@@ -159,10 +155,6 @@ def tambah_data(data, dokumen):
     with open(dokumen, 'w', newline='') as file_csv:
         writer = csv.writer(file_csv)
         writer.writerows(rows)
-
-def csv_ke_dataframe(nama_file):
-    dataframe = pd.read_csv(nama_file)
-    return dataframe
 
 def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global latest_data
@@ -869,8 +861,7 @@ def generate_frames():
     global status_final
     global kondisi_reset
     
-    df = csv_ke_dataframe(urutan_kamera)
-    print(df)
+    
     
     
     while True:
@@ -908,501 +899,59 @@ def generate_frames():
         previous_data_seq = data_seq
         continue_loop = True
 
-        car_type = get_car2()
-        steer_type = get_steer2()
+        #CYCLE1
+        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+        for frame in gen(cameraa):
+            yield frame
 
-        if car_type =="Fortuner":
-            if steer_type == "LHD":
+            if status_box_X == none_stat:
+                kondisi_reset = 2
+                continue_loop = False
 
-                #CYCLE1
-                if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0]) != None:
-                        cycle_1 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_1"].values[0])
-                        mode_1  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0])
+                #time.sleep(5)
 
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-                        
-                #CYCLE2
-                if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_2"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0]) != None:
-                        cycle_2 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])
-                        mode_2  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
-
-                #CYCLE3      
-                if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_3"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0]) != None:
-                        cycle_3 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])
-                        mode_3  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                break
             
+        if not continue_loop:
+            continue
 
-            if steer_type == "RHD":
+        #CYCLE2
+        if mobil == "Innova_RHD":
+            if status_box_Y == none_stat:
+                kondisi_reset = 2
+                #time.sleep(5)
+                continue_loop = False
 
-                #CYCLE1
-                if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0]) != None:
-                        cycle_1 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_1"].values[0])
-                        mode_1  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0])
+                break
 
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+            if not continue_loop:
+                continue
 
-                            if not continue_loop:
-                                continue
+        else :
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
+            for frame in gen2(cameraa):
+                yield frame
 
-                        elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-                        
-                #CYCLE2
-                if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != None:
-                        cycle_2 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])
-                        mode_2  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
+                if status_box_Y == none_stat:
+                    kondisi_reset = 2
+                    #time.sleep(5)
+                    continue_loop = False
 
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                    break
+                
+            if not continue_loop:
+                continue
 
-                            if not continue_loop:
-                                continue
+        #CYCLE3
+        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+        for frame in gen3(cameraa):
+            yield frame
 
-                        elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
+            if status_box_Z == none_stat:
+                kondisi_reset = 2
+                #time.sleep(5)
 
-                #CYCLE3      
-                if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_3"].values[0]) in list_kamera :
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0])!= None:
-                        cycle_3 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])
-                        mode_3  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-            
-        if car_type =="Innova":
-            if steer_type == "LHD":
-
-                #CYCLE1
-                if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0]) != None:
-                        cycle_1 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_1"].values[0])
-                        mode_1  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-                        
-                #CYCLE2
-                if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])!= None:
-                        cycle_2 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])
-                        mode_2  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
-
-                #CYCLE3      
-                if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0]) != None:
-                        cycle_3 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])
-                        mode_3  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-            
-
-            if steer_type == "RHD":
-
-                #CYCLE1
-                if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0]) != None:
-                        cycle_1 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_1"].values[0])
-                        mode_1  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_1]['sceneName']))
-                        if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-                        
-                #CYCLE2
-                if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_2"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != None:
-                        cycle_2 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])
-                        mode_2  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_2]['sceneName']))
-                        if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
-
-                #CYCLE3      
-                if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0])!= None:
-                        cycle_3 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])
-                        mode_3  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0])
-
-                        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[cycle_3]['sceneName']))
-                        if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-
-                            if not continue_loop:
-                                continue
-
-                        elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                            
-                            if not continue_loop:
-                                continue
-                        
-                        elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
-                         
+                break
 
         #CYCLE_WAIT
         if data_seq == previous_data_seq:
