@@ -64,8 +64,8 @@ status_final = None
 
 kondisi_reset = 0
 
-file_plc = 'file_plc.csv'
-file_report = 'file_report.csv'
+file_plc = 'baca_file_ini_plc.csv'
+file_report = 'baca_file_ini_report.csv'
 
 none_stat = "BELUM_TERDETEKSI"
 
@@ -134,27 +134,15 @@ def remove_array(string):
     a = a.strip().strip("'")
     return a
 
-def write_new_line_to_csv(data,dokumen):
-    with open(dokumen, 'w', newline='') as output_file:
+def write_new_line_to_csv(data):
+    with open(file_plc, 'w', newline='') as output_file:
         writer = csv.writer(output_file)
         writer.writerows(data)
 
-def update_continue_csv(data, dokumen):
-    with open(dokumen, 'a', newline='') as output_file:
+def update_continue_csv(data):
+    with open(file_report, 'a', newline='') as output_file:
         writer = csv.writer(output_file)
         writer.writerows(data)
-
-
-def tambah_data(data, dokumen):
-    with open(dokumen, 'r', newline='') as file_csv:
-        reader = csv.reader(file_csv)
-        rows = list(reader)
-    
-    rows[-1].append(data)
-
-    with open(dokumen, 'w', newline='') as file_csv:
-        writer = csv.writer(file_csv)
-        writer.writerows(rows)
 
 def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global latest_data
@@ -759,10 +747,25 @@ def gen_tunggu(camera):
     suffix1 = latest_data ['suffix']
     relay1 = latest_data ['Kode_relay']
 
+    #kondisi_reset = 100
+
     sekarang = datetime.datetime.now()
     tanggal = sekarang.strftime("%d-%m-%Y")
     jam = sekarang.strftime("%H:%M:%S")
 
+    """
+    if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Y)=="OK") and (remove_array(status_box_Z)=="OK"):
+        status_final ={
+            'stat_final' : "OK"
+        }
+        kondisi_reset = 0
+        #data = [[]]
+    else :
+        status_final = {
+            'stat_final' : "NG"
+        }
+        kondisi_reset = 2
+    """
 
     a = get_box_Z2()
     b = get_car2()
@@ -776,39 +779,27 @@ def gen_tunggu(camera):
                 'stat_final' : "OK"
             }
             kondisi_reset = 0
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1,remove_array(actual_box_X), remove_array(status_box_X), remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
-            write_new_line_to_csv(data, file_plc)
-            update_continue_csv(data, file_report)
-
         else :
             status_final = {
                 'stat_final' : "NG"
             }
             kondisi_reset = 2
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1, remove_array(actual_box_X), remove_array(status_box_X), remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
-            write_new_line_to_csv(data, file_plc)
-            update_continue_csv(data, file_report)
-
-
+    
     else :
         if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Y)=="OK") and (remove_array(status_box_Z)=="OK"):
             status_final = {
                 'stat_final' : "OK"
             }
             kondisi_reset = 0
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1, remove_array(actual_box_X), remove_array(status_box_X), remove_array(actual_box_Y), remove_array(status_box_Y), remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
-            write_new_line_to_csv(data, file_plc)
-            update_continue_csv(data, file_report)
-
         else :
             status_final = {
                 'stat_final' : "NG"
             }
             kondisi_reset = 2
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, relay1, remove_array(actual_box_X), remove_array(status_box_X), remove_array(actual_box_Y), remove_array(status_box_Y), remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
-            write_new_line_to_csv(data, file_plc)
-            update_continue_csv(data, file_report)
+        
 
+
+    
     a = get_box_Z2()
     b = get_car2()
     c = get_steer2()
@@ -969,6 +960,8 @@ def generate_frames():
                    
 
 
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -1026,9 +1019,6 @@ def get_value():
 def reset():
     global kondisi_reset
     kondisi_reset = 0
-    approve = "APPROVE"
-    tambah_data(approve, file_plc)
-    tambah_data(approve, file_report)
     return ''
 
 ########################################
