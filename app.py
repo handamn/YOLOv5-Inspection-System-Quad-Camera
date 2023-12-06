@@ -1,4 +1,3 @@
-import datetime
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -36,7 +35,6 @@ nilai_ymax = 450
 
 kuota_benar = 50
 kuota_salah = 50
-kuota_belum = 100
 
 latest_data = None
 data_seq = None
@@ -66,8 +64,6 @@ kondisi_reset = 0
 
 file_plc = 'baca_file_ini_plc.csv'
 file_report = 'baca_file_ini_report.csv'
-
-none_stat = "BELUM_TERDETEKSI"
 
 
 
@@ -327,18 +323,18 @@ def gen(camera):
                     frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
 
                     print("gen1")
-                    print(none_stat)
+                    print("BELUM TERDETEKSI")
                     
                     yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                     
-                    af_array.append(none_stat)
+                    af_array.append("BELUM TERDETEKSI")
                 
-                    if af_array.count(none_stat) > kuota_belum:
+                    if af_array.count("BELUM TERDETEKSI") > kuota_salah:
                         actual_box_X = {
-                            'act_box_X' : none_stat
+                            'act_box_X' : "BELUM TERDETEKSI"
                         }
                         status_box_X = {
-                            'stat_box_X' : none_stat
+                            'stat_box_X' : "BELUM TERDETEKSI"
                         }
                         break
 
@@ -414,19 +410,19 @@ def gen(camera):
 
                 frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
 
-                print(none_stat)
+                print("BELUM TERDETEKSI")
 
                 yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-                af_array.append(none_stat)
+                af_array.append("BELUM TERDETEKSI")
                 print(len(af_array))
                 
-                if af_array.count(none_stat) > kuota_belum:
+                if af_array.count("BELUM TERDETEKSI") > kuota_salah:
                     actual_box_X = {
-                        'act_box_X' : none_stat
+                        'act_box_X' : "BELUM TERDETEKSI"
                     }
                     status_box_X = {
-                        'stat_box_X' : none_stat
+                        'stat_box_X' : "BELUM TERDETEKSI"
                     }
                     break
 
@@ -450,7 +446,6 @@ def gen2(camera):
 
     model = custom_model2()
     df_array = [] # Array untuk menyimpan hasil df
-    af_array = []
 
     while True:
         success, frame = camera.read()
@@ -476,22 +471,10 @@ def gen2(camera):
                     frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
 
                     print("gen2")
-                    print(none_stat)
+                    print("BELUM TERDETEKSI")
                     
 
                     yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                    af_array.append(none_stat)
-
-                    if af_array.count(none_stat) > kuota_belum:
-                        actual_box_Y = {
-                            'act_box_Y' : none_stat
-                        }
-                        status_box_Y = {
-                            'stat_box_Y' : none_stat
-                        }
-                        break
-
 
                 else:
                     df = results.pandas().xyxy[0]['name']
@@ -560,20 +543,9 @@ def gen2(camera):
 
                 frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
 
-                print(none_stat)
+                print("BELUM TERDETEKSI")
 
                 yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-                af_array.append(none_stat)
-                print(len(af_array))
-                
-                if af_array.count(none_stat) > kuota_belum:
-                    actual_box_Y = {
-                        'act_box_Y' : none_stat
-                    }
-                    status_box_Y = {
-                        'stat_box_Y' : none_stat
-                    }
-                    break
 
         else:
             break
@@ -595,7 +567,6 @@ def gen3(camera):
 
     model = custom_model3()
     df_array = [] # Array untuk menyimpan hasil df
-    af_array = []
 
     while True:
         success, frame = camera.read()
@@ -621,21 +592,10 @@ def gen3(camera):
                     frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
 
                     print("gen3")
-                    print(none_stat)
+                    print("BELUM TERDETEKSI")
                     
 
                     yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                    af_array.append(none_stat)
-                
-                    if af_array.count(none_stat) > kuota_belum:
-                        actual_box_Z = {
-                            'act_box_Z' : none_stat
-                        }
-                        status_box_Z = {
-                            'stat_box_Z' : none_stat
-                        }
-                        break
 
                 else:
                     df = results.pandas().xyxy[0]['name']
@@ -703,27 +663,14 @@ def gen3(camera):
 
                 frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
 
-                print(none_stat)
+                print("BELUM TERDETEKSI")
 
                 yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                af_array.append(none_stat)
-                print(len(af_array))
-                
-                if af_array.count(none_stat) > kuota_belum:
-                    actual_box_Z = {
-                        'act_box_Z' : none_stat
-                    }
-                    status_box_Z = {
-                        'stat_box_Z' : none_stat
-                    }
-                    break
 
         else:
             break
 
 def gen_tunggu(camera):
-
     
     global reference_box_X
     global actual_box_X
@@ -737,69 +684,24 @@ def gen_tunggu(camera):
     global status_final
     global kondisi_reset
 
-    global latest_data
-
-    sequence1 = latest_data ['sequence']
-    body_no1 = latest_data ['nomor_body']
-    vin_no1 = latest_data ['vin_no']
-    car1 = latest_data ['car']
-    steering1 = latest_data ['steer']
-    suffix1 = latest_data ['suffix']
-    relay1 = latest_data ['Kode_relay']
-
     #kondisi_reset = 100
 
-    sekarang = datetime.datetime.now()
-    tanggal = sekarang.strftime("%d-%m-%Y")
-    jam = sekarang.strftime("%H:%M:%S")
-
-    """
     if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Y)=="OK") and (remove_array(status_box_Z)=="OK"):
         status_final ={
             'stat_final' : "OK"
         }
         kondisi_reset = 0
-        #data = [[]]
     else :
         status_final = {
             'stat_final' : "NG"
         }
         kondisi_reset = 2
-    """
-
-    a = get_box_Z2()
-    b = get_car2()
-    c = get_steer2()
-    mobil = b + '_' + c
-    stir = data_steer
-
-    if mobil == "Innova_RHD":
-        if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Z)=="OK"):
-            status_final = {
-                'stat_final' : "OK"
-            }
-            kondisi_reset = 0
-        else :
-            status_final = {
-                'stat_final' : "NG"
-            }
-            kondisi_reset = 2
-    
-    else :
-        if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Y)=="OK") and (remove_array(status_box_Z)=="OK"):
-            status_final = {
-                'stat_final' : "OK"
-            }
-            kondisi_reset = 0
-        else :
-            status_final = {
-                'stat_final' : "NG"
-            }
-            kondisi_reset = 2
-        
-
+        #time.sleep(5)
 
     
+
+    
+
     a = get_box_Z2()
     b = get_car2()
     c = get_steer2()
@@ -895,11 +797,32 @@ def generate_frames():
         for frame in gen(cameraa):
             yield frame
 
-            if status_box_X == none_stat:
+            if data_seq != previous_data_seq:
+                actual_box_X = {
+                    'act_box_X' : "NG"
+                }
+                status_box_X = {
+                    'stat_box_X' : "NG"
+                }
+                actual_box_Y = {
+                    'act_box_Y' : "NG"
+                }
+                status_box_Y = {
+                    'stat_box_Y' : "NG"
+                }
+                actual_box_Z = {
+                    'act_box_Z' : "NG"
+                }
+                status_box_Z = {
+                    'stat_box_Z' : "NG"
+                }
+                status_final = {
+                    'stat_final' : "NG"
+                }        
+                print("GAGAL1")
                 kondisi_reset = 2
-                continue_loop = False
-
                 #time.sleep(5)
+                continue_loop = False
 
                 break
             
@@ -908,7 +831,23 @@ def generate_frames():
 
         #CYCLE2
         if mobil == "Innova_RHD":
-            if status_box_Y == none_stat:
+            if data_seq != previous_data_seq:
+                actual_box_Y = {
+                    'act_box_Y' : "NG"
+                }
+                status_box_Y = {
+                    'stat_box_Y' : "NG"
+                }
+                actual_box_Z = {
+                    'act_box_Z' : "NG"
+                }
+                status_box_Z = {
+                    'stat_box_Z' : "NG"
+                }
+                status_final = {
+                    'stat_final' : "NG"
+                }                           
+                print("GAGAL2")
                 kondisi_reset = 2
                 #time.sleep(5)
                 continue_loop = False
@@ -923,7 +862,23 @@ def generate_frames():
             for frame in gen2(cameraa):
                 yield frame
 
-                if status_box_Y == none_stat:
+                if data_seq != previous_data_seq:
+                    actual_box_Y = {
+                        'act_box_Y' : "NG"
+                    }
+                    status_box_Y = {
+                        'stat_box_Y' : "NG"
+                    }
+                    actual_box_Z = {
+                        'act_box_Z' : "NG"
+                    }
+                    status_box_Z = {
+                        'stat_box_Z' : "NG"
+                    }
+                    status_final = {
+                        'stat_final' : "NG"
+                    }                                                  
+                    print("GAGAL2")
                     kondisi_reset = 2
                     #time.sleep(5)
                     continue_loop = False
@@ -938,7 +893,17 @@ def generate_frames():
         for frame in gen3(cameraa):
             yield frame
 
-            if status_box_Z == none_stat:
+            if data_seq != previous_data_seq:
+                actual_box_Z = {
+                    'act_box_Z' : "NG"
+                }
+                status_box_Z = {
+                    'stat_box_Z' : "NG"
+                }
+                status_final = {
+                    'stat_final' : "NG"
+                }                                      
+                print("GAGAL3")
                 kondisi_reset = 2
                 #time.sleep(5)
 
@@ -1114,3 +1079,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
+
