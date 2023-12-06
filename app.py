@@ -60,11 +60,6 @@ status_box_Z = None
 
 status_final = None
 
-kondisi_reset = 0
-
-file_plc = 'baca_file_ini_plc.csv'
-file_report = 'baca_file_ini_report.csv'
-
 
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -130,16 +125,6 @@ def remove_array(string):
     a = a.strip().strip("'")
     return a
 
-def write_new_line_to_csv(data):
-    with open(file_plc, 'w', newline='') as output_file:
-        writer = csv.writer(output_file)
-        writer.writerows(data)
-
-def update_continue_csv(data):
-    with open(file_report, 'a', newline='') as output_file:
-        writer = csv.writer(output_file)
-        writer.writerows(data)
-
 def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global latest_data
     latest_data = {
@@ -154,11 +139,6 @@ def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Bo
         'Box_Y': Box_Y,
         'Box_Z': Box_Z
     }
-    #data = [[sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z, "ok"]]
-    
-    #write_new_line_to_csv(data)
-    #update_continue_csv(data)
-
 
 def handle_sequence(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global data_seq
@@ -277,6 +257,7 @@ def custom_model3():
     return model2
 
 
+#change_variable()
 
 def gen(camera):
     global reference_box_X
@@ -296,7 +277,6 @@ def gen(camera):
     
     model = custom_model()
     df_array = [] # Array untuk menyimpan hasil df
-    af_array = []
 
     while True:
         success, frame = camera.read()
@@ -326,17 +306,6 @@ def gen(camera):
                     print("BELUM TERDETEKSI")
                     
                     yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-                    
-                    af_array.append("BELUM TERDETEKSI")
-                
-                    if af_array.count("BELUM TERDETEKSI") > kuota_salah:
-                        actual_box_X = {
-                            'act_box_X' : "BELUM TERDETEKSI"
-                        }
-                        status_box_X = {
-                            'stat_box_X' : "BELUM TERDETEKSI"
-                        }
-                        break
 
                 else:
                     df = results.pandas().xyxy[0]['name']
@@ -413,18 +382,6 @@ def gen(camera):
                 print("BELUM TERDETEKSI")
 
                 yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                af_array.append("BELUM TERDETEKSI")
-                print(len(af_array))
-                
-                if af_array.count("BELUM TERDETEKSI") > kuota_salah:
-                    actual_box_X = {
-                        'act_box_X' : "BELUM TERDETEKSI"
-                    }
-                    status_box_X = {
-                        'stat_box_X' : "BELUM TERDETEKSI"
-                    }
-                    break
 
         else:
             break
@@ -682,21 +639,16 @@ def gen_tunggu(camera):
     global actual_box_Z
     global status_box_Z
     global status_final
-    global kondisi_reset
-
-    #kondisi_reset = 100
 
     if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Y)=="OK") and (remove_array(status_box_Z)=="OK"):
         status_final ={
             'stat_final' : "OK"
         }
-        kondisi_reset = 0
     else :
         status_final = {
             'stat_final' : "NG"
         }
-        kondisi_reset = 2
-        #time.sleep(5)
+        time.sleep(5)
 
     
 
@@ -752,8 +704,6 @@ def generate_frames():
     global actual_box_Z
     global status_box_Z
     global status_final
-    global kondisi_reset
-    
     
     
     
@@ -820,10 +770,8 @@ def generate_frames():
                     'stat_final' : "NG"
                 }        
                 print("GAGAL1")
-                kondisi_reset = 2
-                #time.sleep(5)
+                time.sleep(5)
                 continue_loop = False
-
                 break
             
         if not continue_loop:
@@ -848,10 +796,8 @@ def generate_frames():
                     'stat_final' : "NG"
                 }                           
                 print("GAGAL2")
-                kondisi_reset = 2
-                #time.sleep(5)
+                time.sleep(5)
                 continue_loop = False
-
                 break
 
             if not continue_loop:
@@ -879,10 +825,8 @@ def generate_frames():
                         'stat_final' : "NG"
                     }                                                  
                     print("GAGAL2")
-                    kondisi_reset = 2
-                    #time.sleep(5)
+                    time.sleep(5)
                     continue_loop = False
-
                     break
                 
             if not continue_loop:
@@ -904,9 +848,7 @@ def generate_frames():
                     'stat_final' : "NG"
                 }                                      
                 print("GAGAL3")
-                kondisi_reset = 2
-                #time.sleep(5)
-
+                time.sleep(5)
                 break
 
         #CYCLE_WAIT
@@ -971,22 +913,6 @@ def get_camera():
     global data_camera
     return jsonify(data_camera)
 
-########################################
-########################################
-
-@app.route('/get_value')
-def get_value():
-    global kondisi_reset
-    return str(kondisi_reset)
-
-
-@app.route('/reset')
-def reset():
-    global kondisi_reset
-    kondisi_reset = 0
-    return ''
-
-########################################
 ########################################
 
 @app.route('/get_reference_box_X')
@@ -1079,4 +1005,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
-
