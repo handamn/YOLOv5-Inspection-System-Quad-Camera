@@ -30,11 +30,6 @@ path_model ="/home/engser/YOLO/yolov5_research2/model_custom/"
 
 # Global variable to store the latest data
 data_acuan = pd.Series(np.array([1]))
-nilai_ymin = 10
-nilai_ymax = 450
-
-kuota_benar = 50
-kuota_salah = 50
 
 latest_data = None
 data_seq = None
@@ -44,21 +39,6 @@ data_steer = None
 data_box_X = None
 data_box_Y = None
 data_box_Z = None
-
-
-reference_box_X = None
-actual_box_X = None
-status_box_X = None
-
-reference_box_Y = None
-actual_box_Y = None
-status_box_Y = None
-
-reference_box_Z = None
-actual_box_Z = None
-status_box_Z = None
-
-status_final = None
 
 
 
@@ -106,24 +86,7 @@ class FileChangeHandler(FileSystemEventHandler):
                 print("Box Y:", Box_Y)
                 print("Box Z:", Box_Z)
 
-def draw_horizontal_lines(image, height1, height2):
-    cv2.line(image, (0, height1), (image.shape[1], height1), (0, 0, 255), 2)
-    cv2.line(image, (0, height2), (image.shape[1], height2), (0, 0, 255), 2)
-    return image
 
-def remove_prefix(string):
-    if len(string) > 3:
-        return string[3:]
-    else:
-        return ""
-
-def remove_array(string):
-    a = string
-    a = str(a)
-    a = a.strip("{}")
-    a = a.split(":")[1]
-    a = a.strip().strip("'")
-    return a
 
 def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global latest_data
@@ -166,23 +129,238 @@ def handle_box_X(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, B
         'box_X2' : Box_X
     }
 
+#model3 = handle_box_X(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z)
+
+
 def handle_box_Y(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global data_box_Y
     data_box_Y = {
         'box_Y2' : Box_Y
     }
+    
 
 def handle_box_Z(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global data_box_Z
     data_box_Z = {
         'box_Z2' : Box_Z
     }
+    time.sleep(3)
+    data_box_Z = {
+        'box_Z2' : Box_Y
+    }
+    time.sleep(3)
+    data_box_Z = {
+        'box_Z2' : Box_X
+    }
+    time.sleep(3)
 
-def get_sequence2():
+
+
+def custom_model():
+    a = get_box_X2()
+    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box1/'+a+'/train1/weights/best.pt', source='local',force_reload=True)
+    return model2
+    
+
+
+
+def draw_horizontal_lines(image, height1, height2):
+    cv2.line(image, (0, height1), (image.shape[1], height1), (0, 0, 255), 2)
+    cv2.line(image, (0, height2), (image.shape[1], height2), (0, 0, 255), 2)
+    return image
+
+def gen(camera):
+    model = custom_model()
+    df_array = [] # Array untuk menyimpan hasil df
+
+    while True:
+        success, frame = camera.read()
+
+        if success:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            img = Image.open(io.BytesIO(frame))
+            results = model(img, size=640)
+
+            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
+                ymin = results.pandas().xyxy[0]['ymin'][0]
+                ymax = results.pandas().xyxy[0]['ymax'][0]
+
+                if ymin < 100 or ymax > 400:
+                    img = np.array(img)  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    print("BELUM TERDETEKSI")
+
+                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                else:
+                    df = results.pandas().xyxy[0]['name']
+                    ef = df.to_string()
+                    print(ef)
+
+                    df_array.append(ef)
+
+                    nilai_unik = list(set(df_array))
+                    print(len(df_array))  # Menyimpan hasil df dalam array
+                    print("==============")
+                    img = np.squeeze(results.render())  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                    # Perhitungan jika ada nilai yang sama sebanyak 500
+
+                    if ef != "NG":
+                        if df_array.count(ef) > 100:
+                            break
+
+            else:
+                ymin = 0
+                ymax = 0
+
+                img = np.array(img)  # RGB
+                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                # Gambar garis horizontal
+                img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                print("BELUM TERDETEKSI")
+
+                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        else:
+            break
+
+
+
+
+"""
+def command(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
+    global data_camera
+    if car == "Fortuner":
+        if steer == "LHD":
+            #ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[0]['sceneName']
+            }
+            
+            time.sleep(9) #seolah-olah proses
+
+            #ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[1]['sceneName']
+            }
+            time.sleep(9) #seolah-olah proses
+
+            #ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[2]['sceneName']
+            }
+            time.sleep(9)
+        
+        else:
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[2]['sceneName']
+            }
+            time.sleep(3)
+
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[0]['sceneName']
+            }
+            time.sleep(3)
+
+            ws.call(requests.SetCurrentProgramScene(sceneName =list_scene[1]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[1]['sceneName']
+            }
+            time.sleep(3)
+    
+    else :
+        if steer == "LHD":
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[2]['sceneName']
+            }
+            time.sleep(3) #seolah-olah proses
+
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[1]['sceneName']
+            }
+            time.sleep(3) #seolah-olah proses
+
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[3]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[3]['sceneName']
+            }
+            time.sleep(3)
+        
+        else:
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[2]['sceneName']
+            }
+            time.sleep(3)
+
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[0]['sceneName']
+            }
+            time.sleep(3)
+
+            ws.call(requests.SetCurrentProgramScene(sceneName =list_scene[1]['sceneName']))
+            data_camera = {
+                'camera' : list_scene[1]['sceneName']
+            }
+            time.sleep(3)
+"""
+
+
+
+def generate_frames():
+    cameraa = camera1
+    global data_car
+    global data_steer
+    global data_box_X
+    global data_box_Y
+    global data_box_Z
     global data_seq
 
-    return data_seq
+    while True:
 
+        start_time1 = time.time()
+        previous_data_seq = data_seq
+
+        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+        for frame in gen(cameraa):
+            yield frame
+
+            a = get_box_X2()
+            print(a)
+
+            current_time = time.time()
+            elapsed_time = current_time - start_time1
+
+            if data_seq != previous_data_seq:
+                break
+
+    
 def get_box_X2():
     global data_box_X
     a = data_box_X
@@ -191,683 +369,7 @@ def get_box_X2():
     a = a.split(":")[1]
     a = a.strip().strip("'")
     return a
-
-def get_box_Y2():
-    global data_box_Y
-    b = data_box_Y
-    b = str(data_box_Y)
-    b = b.strip("{}")
-    b = b.split(":")[1]
-    b = b.strip().strip("'")
-    return b
-
-def get_box_Z2():
-    global data_box_Z
-    c = data_box_Z
-    c = str(data_box_Z)
-    c = c.strip("{}")
-    c = c.split(":")[1]
-    c = c.strip().strip("'")
-    return c
-
-def get_car2():
-    global data_car
-    a = data_car
-    a = str(data_car)
-    a = a.strip("{}")
-    a = a.split(":")[1]
-    a = a.strip().strip("'")
-    return a
-
-def get_steer2():
-    global data_steer
-    a = data_steer
-    a = str(data_steer)
-    a = a.strip("{}")
-    a = a.split(":")[1]
-    a = a.strip().strip("'")
-    return a
-
-
-def custom_model():
-    a = get_box_X2()
-    b = get_car2()
-    c = get_steer2()
-    mobil = b + '_' + c
-
-    model2 = torch.hub.load('.', 'custom', path_model + mobil +'/Box1/'+a+'/train1/weights/best.pt', source='local',force_reload=True)
-    return model2
     
-def custom_model2():
-    a = get_box_Y2()
-    b = get_car2()
-    c = get_steer2()
-    mobil = b + '_' + c
-
-    model2 = torch.hub.load('.', 'custom', path_model + mobil +'/Box2/'+ a +'/train1/weights/best.pt', source='local',force_reload=True)
-    return model2
-
-def custom_model3():
-    a = get_box_Z2()
-    b = get_car2()
-    c = get_steer2()
-    mobil = b + '_' + c
-    model2 = torch.hub.load('.', 'custom', path_model + mobil +'/Box3/'+a+'/train1/weights/best.pt', source='local',force_reload=True)
-    
-    return model2
-
-
-#change_variable()
-
-def gen(camera):
-    global reference_box_X
-    global actual_box_X
-    global status_box_X
-
-    reference_box_X = None
-    actual_box_X = None
-    status_box_X = None
-
-    temp_reference_box_X = remove_prefix(get_box_X2())
-
-    reference_box_X = {
-        'ref_box_X' : temp_reference_box_X
-    }
-
-    
-    model = custom_model()
-    df_array = [] # Array untuk menyimpan hasil df
-
-    while True:
-        success, frame = camera.read()
-
-
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-
-            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
-                ymin = results.pandas().xyxy[0]['ymin'][0]
-                ymax = results.pandas().xyxy[0]['ymax'][0]
-
-                if ymin < nilai_ymin or ymax > nilai_ymax:
-                    img = np.array(img)  # RGB
-                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                    # Gambar garis horizontal
-                    img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                    print("gen1")
-                    print("BELUM TERDETEKSI")
-                    
-                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                else:
-                    df = results.pandas().xyxy[0]['name']
-                    ef = df.to_string()
-                    ef = ef.split()[1]
-                    print("============")
-                    print(ef)
-
-                    df_array.append(ef)
-
-                    nilai_unik = list(set(df_array))
-                    print("gen1")
-                    print(len(df_array))  # Menyimpan hasil df dalam array
-                    print("==============")
-                    img = np.squeeze(results.render())  # RGB
-                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                    # Gambar garis horizontal
-                    img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                    # Perhitungan jika ada nilai yang sama sebanyak 500
-
-                    if ef != "NG":
-                        if df_array.count(ef) > kuota_benar:
-                            actual_box_X = {
-                                'act_box_X' : ef
-                            }
-                            if temp_reference_box_X == ef:
-                                status_box_X = {
-                                    'stat_box_X' : "OK"
-                                }
-                            else :
-                                status_box_X = {
-                                    'stat_box_X' : "NG"
-                                }
-
-                            break
-                            
-                    else:
-                        if df_array.count("NG") > kuota_salah:
-                            actual_box_X = {
-                                'act_box_X' : ef
-                            }
-                            status_box_X = {
-                                'stat_box_X' : "NG"
-                            }
-                            
-
-                            print("================================")
-                            print("================================")
-                            print("================================")
-                            print("================================")
-                            break
-                    
-                            
-                    
-
-            else:
-                ymin = 0
-                ymax = 0
-
-                img = np.array(img)  # RGB
-                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                # Gambar garis horizontal
-                img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                print("BELUM TERDETEKSI")
-
-                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        else:
-            break
-
-def gen2(camera):
-    global reference_box_Y
-    global actual_box_Y
-    global status_box_Y
-
-    reference_box_Y = None
-    actual_box_Y = None
-    status_box_Y = None
-
-    temp_reference_box_Y = remove_prefix(get_box_Y2())
-
-    reference_box_Y = {
-        'ref_box_Y' : temp_reference_box_Y
-    }
-
-    model = custom_model2()
-    df_array = [] # Array untuk menyimpan hasil df
-
-    while True:
-        success, frame = camera.read()
-
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-
-            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
-                ymin = results.pandas().xyxy[0]['ymin'][0]
-                ymax = results.pandas().xyxy[0]['ymax'][0]
-
-                if ymin < nilai_ymin or ymax > nilai_ymax:
-                    img = np.array(img)  # RGB
-                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                    # Gambar garis horizontal
-                    img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                    print("gen2")
-                    print("BELUM TERDETEKSI")
-                    
-
-                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                else:
-                    df = results.pandas().xyxy[0]['name']
-                    ef = df.to_string()
-                    ef = ef.split()[1]
-                    print(ef)
-
-                    df_array.append(ef)
-
-                    nilai_unik = list(set(df_array))
-                    print("gen2")
-                    print(len(df_array))  # Menyimpan hasil df dalam array
-                    print("==============")
-                    img = np.squeeze(results.render())  # RGB
-                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                    # Gambar garis horizontal
-                    img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                    # Perhitungan jika ada nilai yang sama sebanyak 500
-
-                    if ef != "NG":
-                        if df_array.count(ef) > kuota_benar:
-                            actual_box_Y = {
-                                'act_box_Y' : ef
-                            }
-                            if temp_reference_box_Y == ef:
-                                status_box_Y = {
-                                    'stat_box_Y' : "OK"
-                                }
-                            else:
-                                status_box_Y = {
-                                    'stat_box_Y' : "NG"
-                                }
-
-                            break
-                    
-                    else:
-                        if df_array.count("NG") > kuota_salah:
-                            actual_box_Y = {
-                                'act_box_Y' : ef
-                            }
-                            status_box_Y = {
-                                'stat_box_Y' : "NG"
-                            }
-
-                            print("================================")
-                            print("================================")
-                            print("================================")
-                            print("================================")
-                            break
-
-            else:
-                ymin = 0
-                ymax = 0
-
-                img = np.array(img)  # RGB
-                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                # Gambar garis horizontal
-                img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                print("BELUM TERDETEKSI")
-
-                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        else:
-            break
-
-def gen3(camera):
-    global reference_box_Z
-    global actual_box_Z
-    global status_box_Z
-
-    reference_box_Z = None
-    actual_box_Z = None
-    status_box_Z = None
-
-    temp_reference_box_Z = remove_prefix(get_box_Z2())
-
-    reference_box_Z = {
-        'ref_box_Z' : temp_reference_box_Z
-    }
-
-    model = custom_model3()
-    df_array = [] # Array untuk menyimpan hasil df
-
-    while True:
-        success, frame = camera.read()
-
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-
-            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
-                ymin = results.pandas().xyxy[0]['ymin'][0]
-                ymax = results.pandas().xyxy[0]['ymax'][0]
-
-                if ymin < nilai_ymin or ymax > nilai_ymax:
-                    img = np.array(img)  # RGB
-                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                    # Gambar garis horizontal
-                    img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                    print("gen3")
-                    print("BELUM TERDETEKSI")
-                    
-
-                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                else:
-                    df = results.pandas().xyxy[0]['name']
-                    ef = df.to_string()
-                    ef = ef.split()[1]
-                    print(ef)
-
-                    df_array.append(ef)
-
-                    nilai_unik = list(set(df_array))
-                    print("gen3")
-                    print(len(df_array))  # Menyimpan hasil df dalam array
-                    print("==============")
-                    img = np.squeeze(results.render())  # RGB
-                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                    # Gambar garis horizontal
-                    img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                    # Perhitungan jika ada nilai yang sama sebanyak 500
-
-                    if ef != "NG":
-                        if df_array.count(ef) > kuota_benar:
-                            actual_box_Z = {
-                                'act_box_Z' : ef
-                            }
-                            if temp_reference_box_Z == ef:
-                                status_box_Z = {
-                                    'stat_box_Z' : "OK"
-                                }
-                            else :
-                                status_box_Z = {
-                                    'stat_box_Z' : "NG"
-                                }
-
-                            break
-                    else:
-                        if df_array.count("NG") > kuota_salah:
-                            actual_box_Z = {
-                                'act_box_Z' : ef
-                            }
-                            status_box_Z = {
-                                'stat_box_Z' : "NG"
-                            }
-
-                            print("================================")
-                            print("================================")
-                            print("================================")
-                            print("================================")
-                            break
-
-            else:
-                ymin = 0
-                ymax = 0
-
-                img = np.array(img)  # RGB
-                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-                # Gambar garis horizontal
-                img_BGR = draw_horizontal_lines(img_BGR, nilai_ymin, nilai_ymax)
-
-                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-                print("BELUM TERDETEKSI")
-
-                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        else:
-            break
-
-def gen_tunggu(camera):
-    
-    global reference_box_X
-    global actual_box_X
-    global status_box_X
-    global reference_box_Y
-    global actual_box_Y
-    global status_box_Y
-    global reference_box_Z
-    global actual_box_Z
-    global status_box_Z
-    global status_final
-
-    if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Y)=="OK") and (remove_array(status_box_Z)=="OK"):
-        status_final ={
-            'stat_final' : "OK"
-        }
-    else :
-        status_final = {
-            'stat_final' : "NG"
-        }
-        time.sleep(5)
-
-    
-
-    
-
-    a = get_box_Z2()
-    b = get_car2()
-    c = get_steer2()
-    mobil = b + '_' + c
-
-    model = custom_model3()
-    df_array = [] # Array untuk menyimpan hasil df
-
-    while True:
-        success, frame = camera.read()
-
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-
-            
-            ymin = 0
-            ymax = 0
-
-            img = np.array(img)  # RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-            print("TUNGGU DATA MASUK")
-
-            yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        
-        else:
-            break
-    
-
-
-
-def generate_frames():
-    cameraa = camera1
-
-    global reference_box_X
-    global actual_box_X
-    global status_box_X
-    global reference_box_Y
-    global actual_box_Y
-    global status_box_Y
-    global reference_box_Z
-    global actual_box_Z
-    global status_box_Z
-    global status_final
-    
-    
-    
-    while True:
-        ###untuk membuktikan bahwa terjadi NG #time.sleep(5)
-        reference_box_X = None
-        actual_box_X = None
-        status_box_X = None
-        reference_box_Y = None
-        actual_box_Y = None
-        status_box_Y = None
-        reference_box_Z = None
-        actual_box_Z = None
-        status_box_Z = None
-        status_final = None
-
-        reference_box_X = {
-            'ref_box_X' : remove_prefix(get_box_X2())
-        }
-
-        reference_box_Y = {
-            'ref_box_Y' : remove_prefix(get_box_Y2())
-        }        
-
-        reference_box_Z = {
-            'ref_box_Z' : remove_prefix(get_box_Z2())
-        }     
-
-
-
-        a = get_box_Z2()
-        b = get_car2()
-        c = get_steer2()
-        mobil = b + '_' + c
-        stir = data_steer
-        previous_data_seq = data_seq
-        continue_loop = True
-
-        #CYCLE1
-        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
-        for frame in gen(cameraa):
-            yield frame
-
-            if data_seq != previous_data_seq:
-                actual_box_X = {
-                    'act_box_X' : "NG"
-                }
-                status_box_X = {
-                    'stat_box_X' : "NG"
-                }
-                actual_box_Y = {
-                    'act_box_Y' : "NG"
-                }
-                status_box_Y = {
-                    'stat_box_Y' : "NG"
-                }
-                actual_box_Z = {
-                    'act_box_Z' : "NG"
-                }
-                status_box_Z = {
-                    'stat_box_Z' : "NG"
-                }
-                status_final = {
-                    'stat_final' : "NG"
-                }        
-                print("GAGAL1")
-                time.sleep(5)
-                continue_loop = False
-                break
-            
-        if not continue_loop:
-            continue
-
-        #CYCLE2
-        if mobil == "Innova_RHD":
-            if data_seq != previous_data_seq:
-                actual_box_Y = {
-                    'act_box_Y' : "NG"
-                }
-                status_box_Y = {
-                    'stat_box_Y' : "NG"
-                }
-                actual_box_Z = {
-                    'act_box_Z' : "NG"
-                }
-                status_box_Z = {
-                    'stat_box_Z' : "NG"
-                }
-                status_final = {
-                    'stat_final' : "NG"
-                }                           
-                print("GAGAL2")
-                time.sleep(5)
-                continue_loop = False
-                break
-
-            if not continue_loop:
-                continue
-
-        else :
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
-            for frame in gen2(cameraa):
-                yield frame
-
-                if data_seq != previous_data_seq:
-                    actual_box_Y = {
-                        'act_box_Y' : "NG"
-                    }
-                    status_box_Y = {
-                        'stat_box_Y' : "NG"
-                    }
-                    actual_box_Z = {
-                        'act_box_Z' : "NG"
-                    }
-                    status_box_Z = {
-                        'stat_box_Z' : "NG"
-                    }
-                    status_final = {
-                        'stat_final' : "NG"
-                    }                                                  
-                    print("GAGAL2")
-                    time.sleep(5)
-                    continue_loop = False
-                    break
-                
-            if not continue_loop:
-                continue
-
-        #CYCLE3
-        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
-        for frame in gen3(cameraa):
-            yield frame
-
-            if data_seq != previous_data_seq:
-                actual_box_Z = {
-                    'act_box_Z' : "NG"
-                }
-                status_box_Z = {
-                    'stat_box_Z' : "NG"
-                }
-                status_final = {
-                    'stat_final' : "NG"
-                }                                      
-                print("GAGAL3")
-                time.sleep(5)
-                break
-
-        #CYCLE_WAIT
-        if data_seq == previous_data_seq:
-            while data_seq == previous_data_seq:
-                # Tunggu hingga data_seq diperbarui
-                ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[5]['sceneName']))
-
-                
-                for frame in gen_tunggu(cameraa):
-                    yield frame
-
-                    if data_seq != previous_data_seq:
-                        break
-                pass
-                   
-
-
-
 
 @app.route('/')
 def index():
@@ -913,68 +415,18 @@ def get_camera():
     global data_camera
     return jsonify(data_camera)
 
-########################################
 
-@app.route('/get_reference_box_X')
-def get_reference_box_X():
-    global reference_box_X
-    return jsonify(reference_box_X)
-
-@app.route('/get_actual_box_X')
-def get_actual_box_X():
-    global actual_box_X
-    return jsonify(actual_box_X)
-
-@app.route('/get_status_box_X')
-def get_status_box_X():
-    global status_box_X
-    return jsonify(status_box_X)
-
-########################################
-
-@app.route('/get_reference_box_Y')
-def get_reference_box_Y():
-    global reference_box_Y
-    return jsonify(reference_box_Y)
-
-@app.route('/get_actual_box_Y')
-def get_actual_box_Y():
-    global actual_box_Y
-    return jsonify(actual_box_Y)
-
-@app.route('/get_status_box_Y')
-def get_status_box_Y():
-    global status_box_Y
-    return jsonify(status_box_Y)
-
-########################################
-
-@app.route('/get_reference_box_Z')
-def get_reference_box_Z():
-    global reference_box_Z
-    return jsonify(reference_box_Z)
-
-@app.route('/get_actual_box_Z')
-def get_actual_box_Z():
-    global actual_box_Z
-    return jsonify(actual_box_Z)
-
-@app.route('/get_status_box_Z')
-def get_status_box_Z():
-    global status_box_Z
-    return jsonify(status_box_Z)
-
-########################################
-
-@app.route('/get_status_final')
-def get_status_final():
-    global status_final
-    return jsonify(status_final)
 
 
 
 @app.route('/video')
 def video():
+    """
+    def generate_frames():
+        cameraa = camera1
+        for frame in gen(cameraa):
+            yield frame
+"""
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
