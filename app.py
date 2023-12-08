@@ -10,6 +10,7 @@ from PIL import Image
 import torch
 from obswebsocket import obsws, requests
 from obswebsocket.exceptions import ConnectionFailure
+import pandas as pd
 
 camera1 = cv2.VideoCapture(0)
 
@@ -28,6 +29,8 @@ path_model ="/home/engser/YOLO/yolov5_research2/model_custom/"
 
 
 # Global variable to store the latest data
+data_acuan = pd.Series(np.array([1]))
+
 latest_data = None
 data_seq = None
 data_car = None
@@ -36,7 +39,7 @@ data_steer = None
 data_box_X = None
 data_box_Y = None
 data_box_Z = None
-hasil = None
+
 
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -83,7 +86,6 @@ class FileChangeHandler(FileSystemEventHandler):
                 print("Box Y:", Box_Y)
                 print("Box Z:", Box_Z)
 
-#model2 = torch.hub.load("ultralytics/yolov5", "custom", path="./best.pt", force_reload=True)
 
 
 def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
@@ -138,68 +140,291 @@ def handle_box_Z(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, B
     data_box_Z = {
         'box_Z2' : Box_Z
     }
+    time.sleep(3)
+    data_box_Z = {
+        'box_Z2' : Box_Y
+    }
+    time.sleep(3)
+    data_box_Z = {
+        'box_Z2' : Box_X
+    }
+    time.sleep(3)
 
 
 
-
-def custom_model(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-    if data_steer == "LHD":
-        model2 = torch.hub.load('.', 'custom', path_model + str(data_car['car2']) + '_' + str(data_steer['steer2']) + '/Box1/' + str(data_box_X['box_X2']) +'/train1/weights/best.pt', source='local',force_reload=True)
-        return model2
+def custom_model():
+    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box1/FL_X_6_ABCDEF/train1/weights/best.pt', source='local',force_reload=True)
+    return model2
     
-    
+def custom_model2():
+    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box2/FL_Y_3_ABC/train1/weights/best.pt', source='local',force_reload=True)
+    return model2
+
+def custom_model3():
+    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box3/FL_Z_3_BCD/train1/weights/best.pt', source='local',force_reload=True)
+    return model2
 
 
+def draw_horizontal_lines(image, height1, height2):
+    cv2.line(image, (0, height1), (image.shape[1], height1), (0, 0, 255), 2)
+    cv2.line(image, (0, height2), (image.shape[1], height2), (0, 0, 255), 2)
+    return image
 
-def gen(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-   model = custom_model(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z)
-   while True:
+def gen(camera):
+    model = custom_model()
+    df_array = [] # Array untuk menyimpan hasil df
+
+    while True:
         success, frame = camera.read()
-        
+
         if success:
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
 
             img = Image.open(io.BytesIO(frame))
             results = model(img, size=640)
-            df = results.pandas().xyxy[0]['name']
-            print(df)
 
-            img = np.squeeze(results.render())  # RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
+                ymin = results.pandas().xyxy[0]['ymin'][0]
+                ymax = results.pandas().xyxy[0]['ymax'][0]
 
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+                if ymin < 100 or ymax > 400:
+                    img = np.array(img)  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
 
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    print("BELUM TERDETEKSI")
+
+                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                else:
+                    df = results.pandas().xyxy[0]['name']
+                    ef = df.to_string()
+                    print(ef)
+
+                    df_array.append(ef)
+
+                    nilai_unik = list(set(df_array))
+                    print(len(df_array))  # Menyimpan hasil df dalam array
+                    print("==============")
+                    img = np.squeeze(results.render())  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                    # Perhitungan jika ada nilai yang sama sebanyak 500
+
+                    if ef != "NG":
+                        if df_array.count(ef) > 100:
+                            break
+
+            else:
+                ymin = 0
+                ymax = 0
+
+                img = np.array(img)  # RGB
+                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                # Gambar garis horizontal
+                img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                print("BELUM TERDETEKSI")
+
+                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
         else:
             break
 
-def coba(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-    return gen(cameraa, data_car, data_steer, data_box_X, data_box_Y, data_box_Z)
 
+def gen2(camera):
+   model = custom_model2()
+   df_array = []
+
+   while True:
+        success, frame = camera.read()
+
+        if success:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            img = Image.open(io.BytesIO(frame))
+            results = model(img, size=640)
+
+            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
+                ymin = results.pandas().xyxy[0]['ymin'][0]
+                ymax = results.pandas().xyxy[0]['ymax'][0]
+
+                if ymin < 100 or ymax > 400:
+                    img = np.array(img)  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    print("BELUM TERDETEKSI")
+
+                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                else:
+                    df = results.pandas().xyxy[0]['name']
+                    ef = df.to_string()
+                    print(ef)
+
+                    df_array.append(ef)
+
+                    nilai_unik = list(set(df_array))
+                    print(len(df_array))  # Menyimpan hasil df dalam array
+                    print("==============")
+                    img = np.squeeze(results.render())  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                    # Perhitungan jika ada nilai yang sama sebanyak 500
+
+                    if ef != "NG":
+                        if df_array.count(ef) > 100:
+                            break
+
+            else:
+                ymin = 0
+                ymax = 0
+
+                img = np.array(img)  # RGB
+                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                # Gambar garis horizontal
+                img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                print("BELUM TERDETEKSI")
+
+                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        else:
+            break
+
+
+def gen3(camera):
+   model = custom_model3()
+   df_array = []
+
+   while True:
+        success, frame = camera.read()
+
+        if success:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            img = Image.open(io.BytesIO(frame))
+            results = model(img, size=640)
+
+            if results.pandas().xyxy[0]['ymin'].shape == data_acuan.shape:
+                ymin = results.pandas().xyxy[0]['ymin'][0]
+                ymax = results.pandas().xyxy[0]['ymax'][0]
+
+                if ymin < 100 or ymax > 400:
+                    img = np.array(img)  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    print("BELUM TERDETEKSI")
+
+                    yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                else:
+                    df = results.pandas().xyxy[0]['name']
+                    ef = df.to_string()
+                    print(ef)
+
+                    df_array.append(ef)
+
+                    nilai_unik = list(set(df_array))
+                    print(len(df_array))  # Menyimpan hasil df dalam array
+                    print("==============")
+                    img = np.squeeze(results.render())  # RGB
+                    img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                    # Gambar garis horizontal
+                    img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                    frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+                    # Perhitungan jika ada nilai yang sama sebanyak 500
+
+                    if ef != "NG":
+                        if df_array.count(ef) > 100:
+                            break
+
+            else:
+                ymin = 0
+                ymax = 0
+
+                img = np.array(img)  # RGB
+                img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+                # Gambar garis horizontal
+                img_BGR = draw_horizontal_lines(img_BGR, 100, 400)
+
+                frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+                print("BELUM TERDETEKSI")
+
+                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        else:
+            break
+   
+  
+
+"""
 def command(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global data_camera
     if car == "Fortuner":
         if steer == "LHD":
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+            #ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
             data_camera = {
-                'camera' : list_scene[2]['sceneName']
+                'camera' : list_scene[0]['sceneName']
             }
             
-            time.sleep(3) #seolah-olah proses
+            time.sleep(9) #seolah-olah proses
 
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
+            #ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
             data_camera = {
                 'camera' : list_scene[1]['sceneName']
             }
-            time.sleep(3) #seolah-olah proses
+            time.sleep(9) #seolah-olah proses
 
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[3]['sceneName']))
+            #ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
             data_camera = {
-                'camera' : list_scene[3]['sceneName']
+                'camera' : list_scene[2]['sceneName']
             }
-            time.sleep(3)
+            time.sleep(9)
         
         else:
             ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
@@ -258,26 +483,10 @@ def command(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X,
                 'camera' : list_scene[1]['sceneName']
             }
             time.sleep(3)
-
-
-
 """
-def run2(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
-    global data_car
-    global data_steer
-    global data_box_X
-    global data_box_Y
-    global data_box_Z
 
-    if car == "Fortuner":
-        if steer == "LHD":
-           start_time1 = time.time()
-           
-           while True:
-            current_time = time.time()
-"""      
 
-                    
+
 def generate_frames():
     cameraa = camera1
     global data_car
@@ -285,8 +494,51 @@ def generate_frames():
     global data_box_X
     global data_box_Y
     global data_box_Z
-    for frame in run2(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
-        yield frame
+    global data_seq
+
+    while True:
+
+        start_time1 = time.time()
+        previous_data_seq = data_seq
+
+        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+        for frame in gen(cameraa):
+            yield frame
+
+            current_time = time.time()
+            elapsed_time = current_time - start_time1
+
+            if data_seq != previous_data_seq:
+                break
+
+        start_time2 = time.time()
+        previous_data_seq = data_seq
+
+        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
+        for frame in gen2(cameraa):
+            yield frame
+
+            current_time2 = time.time()
+            elapsed_time2 = current_time2 - start_time2
+
+            if data_seq != previous_data_seq:
+                break
+
+        start_time3 = time.time()
+        previous_data_seq = data_seq
+
+        ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+        for frame in gen3(cameraa):
+            yield frame
+
+            current_time3 = time.time()
+            elapsed_time3 = current_time3 - start_time3
+
+            if data_seq != previous_data_seq:
+                break
+
+
+    
 
 @app.route('/')
 def index():
@@ -333,6 +585,9 @@ def get_camera():
     return jsonify(data_camera)
 
 
+
+
+
 @app.route('/video')
 def video():
     """
@@ -347,20 +602,23 @@ if __name__ == "__main__":
     event_handler = FileChangeHandler('baca_file_ini.csv', handle_data)
     event_handler2 = FileChangeHandler('baca_file_ini.csv', handle_sequence)
     event_handler3 = FileChangeHandler('baca_file_ini.csv', handle_car)
-    event_handler4 = FileChangeHandler('baca_file_ini.csv', command)
+    #event_handler4 = FileChangeHandler('baca_file_ini.csv', command)
     event_handler5 = FileChangeHandler('baca_file_ini.csv', handle_steer)
     event_handler6 = FileChangeHandler('baca_file_ini.csv', handle_box_X)
     event_handler7 = FileChangeHandler('baca_file_ini.csv', handle_box_Y)
     event_handler8 = FileChangeHandler('baca_file_ini.csv', handle_box_Z)
+
+
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
     observer.schedule(event_handler2, path='.', recursive=False)
     observer.schedule(event_handler3, path='.', recursive=False)
-    observer.schedule(event_handler4, path='.', recursive=False)
+    #observer.schedule(event_handler4, path='.', recursive=False)
     observer.schedule(event_handler5, path='.', recursive=False)
     observer.schedule(event_handler6, path='.', recursive=False)
     observer.schedule(event_handler7, path='.', recursive=False)
     observer.schedule(event_handler8, path='.', recursive=False)
+
     observer.start()
 
     try:
