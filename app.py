@@ -36,7 +36,7 @@ data_steer = None
 data_box_X = None
 data_box_Y = None
 data_box_Z = None
-
+hasil = None
 
 
 class FileChangeHandler(FileSystemEventHandler):
@@ -83,7 +83,40 @@ class FileChangeHandler(FileSystemEventHandler):
                 print("Box Y:", Box_Y)
                 print("Box Z:", Box_Z)
 
+#model2 = torch.hub.load("ultralytics/yolov5", "custom", path="./best.pt", force_reload=True)
 
+def gen(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
+   
+   # YOLOv5 Model
+   #model = torch.hub.load("ultralytics/yolov5", "yolov5s", pretrained=True)
+   #model = torch.hub.load("ultralytics/yolov5", "custom", path="./best.pt", force_reload=True)
+   #model = torch.hub.load('.', 'custom', path_model + str(data_car['car2']) + '_' + str(data_steer['steer2']) + '/Box1/' + str(data_box_X['box_X2']) +'/train1/weights/best.pt', source='local',force_reload=True)
+   model = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box1/FL_X_6_ABCDEF/train1/weights/best.pt', source='local',force_reload=True)
+   model.conf = 0.6
+   model.iou = 0.45
+   
+   #model = model2
+   while True:
+        success, frame = camera.read()
+        
+        if success:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            img = Image.open(io.BytesIO(frame))
+            results = model(img, size=640)
+            df = results.pandas().xyxy[0]['name']
+            print(df)
+
+            img = np.squeeze(results.render())  # RGB
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        else:
+            break
 
 def handle_data(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global latest_data
@@ -112,7 +145,7 @@ def handle_car(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box
         'car2' : car
     }
     return data_car
-
+    
 def handle_steer(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global data_steer
     data_steer = {
@@ -137,133 +170,32 @@ def handle_box_Z(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, B
     data_box_Z = {
         'box_Z2' : Box_Z
     }
-    time.sleep(3)
-    data_box_Z = {
-        'box_Z2' : Box_Y
-    }
-    time.sleep(3)
-    data_box_Z = {
-        'box_Z2' : Box_X
-    }
-    time.sleep(3)
 
-
-
-
-
-
-def custom_model(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box1/FL_X_6_ABCDEF/train1/weights/best.pt', source='local',force_reload=True)
-    return model2
-    
-def custom_model2(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box2/FL_Y_3_ABC/train1/weights/best.pt', source='local',force_reload=True)
-    return model2
-
-def custom_model3(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-    model2 = torch.hub.load('.', 'custom', path_model + 'Fortuner_LHD/Box3/FL_Z_3_BCD/train1/weights/best.pt', source='local',force_reload=True)
-    return model2
-
-
-def gen(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-   model = custom_model(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z)
-   while True:
-        success, frame = camera.read()
-        
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-            df = results.pandas().xyxy[0]['name']
-            print(df)
-
-            img = np.squeeze(results.render())  # RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        else:
-            break
-
-def gen2(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-   model = custom_model2(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z)
-   while True:
-        success, frame = camera.read()
-        
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-            df = results.pandas().xyxy[0]['name']
-            print(df)
-
-            img = np.squeeze(results.render())  # RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        else:
-            break
-
-def gen3(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-   model = custom_model3(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z)
-   while True:
-        success, frame = camera.read()
-        
-        if success:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-            df = results.pandas().xyxy[0]['name']
-            print(df)
-
-            img = np.squeeze(results.render())  # RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
-
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        else:
-            break
-
-
-def coba(camera, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-    return gen(cameraa, data_car, data_steer, data_box_X, data_box_Y, data_box_Z)
 
 def command(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
     global data_camera
     if car == "Fortuner":
         if steer == "LHD":
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[0]['sceneName']))
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
             data_camera = {
-                'camera' : list_scene[0]['sceneName']
+                'camera' : list_scene[2]['sceneName']
             }
             
-            time.sleep(9) #seolah-olah proses
+
+            time.sleep(3) #seolah-olah proses
 
             ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[1]['sceneName']))
             data_camera = {
                 'camera' : list_scene[1]['sceneName']
             }
-            time.sleep(9) #seolah-olah proses
+            time.sleep(3) #seolah-olah proses
 
-            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
+            ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[3]['sceneName']))
             data_camera = {
-                'camera' : list_scene[2]['sceneName']
+                'camera' : list_scene[3]['sceneName']
             }
-            time.sleep(9)
-        """
+            time.sleep(3)
+        
         else:
             ws.call(requests.SetCurrentProgramScene(sceneName=list_scene[2]['sceneName']))
             data_camera = {
@@ -321,21 +253,6 @@ def command(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X,
                 'camera' : list_scene[1]['sceneName']
             }
             time.sleep(3)
-"""
-"""
-def run2(sequence, nomor_body, vin_no, car, steer, suffix, Kode_relay, Box_X, Box_Y, Box_Z):
-    if car == "Fortuner":
-        if steer == "LHD":
-           start_time = time.time()
-
-            while True:
-                current_time = time.time()  # Waktu saat ini
-                elapsed_time = current_time - start_time
-
-                    if elapsed_time < 3:
-                        gen(cameraa)
-"""
-
 
 def generate_frames():
     cameraa = camera1
@@ -344,40 +261,8 @@ def generate_frames():
     global data_box_X
     global data_box_Y
     global data_box_Z
-
-    start_time1 = time.time()
     for frame in gen(cameraa, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
         yield frame
-
-        current_time = time.time()
-        elapsed_time = current_time - start_time1
-
-        if elapsed_time >=9:
-            break
-    
-    start_time2 = time.time()
-    for frame in gen2(cameraa, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-        yield frame
-
-        current_time2 = time.time()
-        elapsed_time2 = current_time2 - start_time2
-
-        if elapsed_time2 >=9:
-            break
-
-
-    start_time3 = time.time()
-    for frame in gen3(cameraa, data_car, data_steer, data_box_X, data_box_Y, data_box_Z):
-        yield frame
-
-        current_time3 = time.time()
-        elapsed_time3 = current_time3 - start_time3
-
-        if elapsed_time3 >=9:
-            break
-
-
-    
 
 @app.route('/')
 def index():
@@ -424,9 +309,6 @@ def get_camera():
     return jsonify(data_camera)
 
 
-
-
-
 @app.route('/video')
 def video():
     """
@@ -446,8 +328,6 @@ if __name__ == "__main__":
     event_handler6 = FileChangeHandler('baca_file_ini.csv', handle_box_X)
     event_handler7 = FileChangeHandler('baca_file_ini.csv', handle_box_Y)
     event_handler8 = FileChangeHandler('baca_file_ini.csv', handle_box_Z)
-
-
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
     observer.schedule(event_handler2, path='.', recursive=False)
@@ -457,7 +337,6 @@ if __name__ == "__main__":
     observer.schedule(event_handler6, path='.', recursive=False)
     observer.schedule(event_handler7, path='.', recursive=False)
     observer.schedule(event_handler8, path='.', recursive=False)
-
     observer.start()
 
     try:
