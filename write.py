@@ -12,7 +12,7 @@ filename_tulis_csv = "baca_file_ini.csv"
 filename_tulis = path + filename_tulis_csv
 
 #nama file transform
-filename_read_transform_csv = "transform_data4.csv"
+filename_read_transform_csv = "transform_data5.csv"
 
 #path file transform
 filename_read_transform = path + filename_read_transform_csv
@@ -31,4 +31,4 @@ for x in range(len(df_read)):
 
     print(gf)
 
-    time.sleep(15)
+    time.sleep(30)
