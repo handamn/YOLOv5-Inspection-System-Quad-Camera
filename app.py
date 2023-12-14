@@ -39,7 +39,7 @@ nilai_ymax = 450
 
 kuota_benar = 50
 kuota_salah = 50
-kuota_belum = 100
+kuota_belum = 300
 
 list_kamera = [0,1,2,3]
 
@@ -1672,7 +1672,7 @@ app.config['LATEST_IMAGE_X'] = ''
 app.config['LATEST_IMAGE_Y'] = ''
 app.config['LATEST_IMAGE_Z'] = ''
 app.config['DISPLAY_IMAGES'] = {'x': True, 'y': True, 'z': True}
-app.config['CSV_FILE_PATH'] = 'baca_file_ini.csv'
+app.config['CSV_FILE_PATH'] = 'data_terima.csv'
 app.config['CSV_FILE_LAST_MODIFIED'] = 0
 
 
@@ -1731,7 +1731,7 @@ app.config['LATEST_IMAGE_X2'] = ''
 app.config['LATEST_IMAGE_Y2'] = ''
 app.config['LATEST_IMAGE_Z2'] = ''
 app.config['DISPLAY_IMAGES2'] = {'x2': True, 'y2': True, 'z2': True}
-app.config['CSV_FILE_PATH2'] = 'baca_file_ini.csv'
+app.config['CSV_FILE_PATH2'] = 'data_terima.csv'
 app.config['CSV_FILE_LAST_MODIFIED2'] = 0
 
 wkwk = "0_BLANK.jpg"
@@ -1981,14 +1981,14 @@ def video():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    event_handler = FileChangeHandler('baca_file_ini.csv', handle_data)
-    event_handler2 = FileChangeHandler('baca_file_ini.csv', handle_sequence)
-    event_handler3 = FileChangeHandler('baca_file_ini.csv', handle_car)
-    #event_handler4 = FileChangeHandler('baca_file_ini.csv', command)
-    event_handler5 = FileChangeHandler('baca_file_ini.csv', handle_steer)
-    event_handler6 = FileChangeHandler('baca_file_ini.csv', handle_box_X)
-    event_handler7 = FileChangeHandler('baca_file_ini.csv', handle_box_Y)
-    event_handler8 = FileChangeHandler('baca_file_ini.csv', handle_box_Z)
+    event_handler = FileChangeHandler('data_terima.csv', handle_data)
+    event_handler2 = FileChangeHandler('data_terima.csv', handle_sequence)
+    event_handler3 = FileChangeHandler('data_terima.csv', handle_car)
+    #event_handler4 = FileChangeHandler('data_terima.csv', command)
+    event_handler5 = FileChangeHandler('data_terima.csv', handle_steer)
+    event_handler6 = FileChangeHandler('data_terima.csv', handle_box_X)
+    event_handler7 = FileChangeHandler('data_terima.csv', handle_box_Y)
+    event_handler8 = FileChangeHandler('data_terima.csv', handle_box_Z)
     event_handler9 = ImageHandler()
     event_handler10 = ImageHandler2()
 
