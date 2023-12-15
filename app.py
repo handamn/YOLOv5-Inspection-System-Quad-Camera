@@ -946,26 +946,37 @@ def gen_tunggu(camera):
         'camera' : list_scene[5]['sceneName']
     }
 
-    if mobil == "Innova_RHD":
-        if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Z)=="OK"):
+    if (mobil == "Innova_RHD") or (mobil == "Fortuner_RHD") or (mobil == "Fortuner_LHD") or (mobil == "Zenix_all"):
+        if mobil != "Zenix_all":
+            if (remove_array(status_box_X)=="OK") and (remove_array(status_box_Z)=="OK"):
+                status_final = {
+                    'stat_final' : "OK"
+                }
+                kondisi_reset = 0
+                data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, trimming_code1, relay1,remove_array(actual_box_X), remove_array(status_box_X), pesan_kosong, pesan_kosong, remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
+                write_new_line_to_csv(data, file_plc)
+                update_continue_csv(data, file_report)
+                notif_final = "OK"
+
+            else :
+                status_final = {
+                    'stat_final' : "NG"
+                }
+                kondisi_reset = 2
+                data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, trimming_code1, relay1, remove_array(actual_box_X), remove_array(status_box_X), pesan_kosong, pesan_kosong, remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
+                write_new_line_to_csv(data, file_plc)
+                update_continue_csv(data, file_report)
+                notif_final = "NG"
+        
+        else :
             status_final = {
                 'stat_final' : "OK"
             }
             kondisi_reset = 0
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, trimming_code1, relay1,remove_array(actual_box_X), remove_array(status_box_X), pesan_kosong, pesan_kosong, remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
+            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, trimming_code1]]
             write_new_line_to_csv(data, file_plc)
             update_continue_csv(data, file_report)
             notif_final = "OK"
-
-        else :
-            status_final = {
-                'stat_final' : "NG"
-            }
-            kondisi_reset = 2
-            data = [[tanggal, jam, sequence1, body_no1, vin_no1, car1, steering1, suffix1, trimming_code1, relay1, remove_array(actual_box_X), remove_array(status_box_X), pesan_kosong, pesan_kosong, remove_array(actual_box_Z), remove_array(status_box_Z), remove_array(status_final)]]
-            write_new_line_to_csv(data, file_plc)
-            update_continue_csv(data, file_report)
-            notif_final = "NG"
 
 
     else :
@@ -1091,7 +1102,7 @@ def generate_frames():
 
                 #CYCLE1
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0]) != "all":
                         cycle_1 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_1"].values[0])
                         mode_1  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0])
 
@@ -1137,7 +1148,7 @@ def generate_frames():
                         
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_2"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0]) != "all":
                         cycle_2 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])
                         mode_2  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0])
 
@@ -1183,7 +1194,7 @@ def generate_frames():
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_3"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0]) != "all":
                         cycle_3 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])
                         mode_3  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0])
 
@@ -1232,7 +1243,7 @@ def generate_frames():
 
                 #CYCLE1
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0]) != "all":
                         cycle_1 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_1"].values[0])
                         mode_1  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0])
 
@@ -1278,7 +1289,7 @@ def generate_frames():
                         
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != "all":
                         cycle_2 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])
                         mode_2  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
 
@@ -1324,7 +1335,7 @@ def generate_frames():
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_3"].values[0]) in list_kamera :
-                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0])!= None:
+                    if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0])!= "all":
                         cycle_3 = int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])
                         mode_3  = str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0])
 
@@ -1373,7 +1384,7 @@ def generate_frames():
 
                 #CYCLE1
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0]) != "all":
                         cycle_1 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_1"].values[0])
                         mode_1  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0])
 
@@ -1419,7 +1430,7 @@ def generate_frames():
                         
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])!= None:
+                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])!= "all":
                         cycle_2 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])
                         mode_2  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])
 
@@ -1465,7 +1476,7 @@ def generate_frames():
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0]) != "all":
                         cycle_3 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])
                         mode_3  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0])
 
@@ -1514,7 +1525,7 @@ def generate_frames():
 
                 #CYCLE1
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_1"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0]) != "all":
                         cycle_1 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_1"].values[0])
                         mode_1  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0])
 
@@ -1560,7 +1571,7 @@ def generate_frames():
                         
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_2"].values[0]) in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != None:
+                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != "all":
                         cycle_2 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])
                         mode_2  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
 
@@ -1606,7 +1617,7 @@ def generate_frames():
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])in list_kamera:
-                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0])!= None:
+                    if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0])!= "all":
                         cycle_3 = int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])
                         mode_3  = str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0])
 
