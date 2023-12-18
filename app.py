@@ -1127,9 +1127,12 @@ def generate_frames():
                         elif mode_1 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1145,6 +1148,14 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
                         
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_2"].values[0]) in list_kamera:
@@ -1173,9 +1184,12 @@ def generate_frames():
                         elif mode_2 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1191,6 +1205,14 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue                
+                        
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Cycle_3"].values[0]) in list_kamera:
@@ -1219,9 +1241,12 @@ def generate_frames():
                         elif mode_3 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1238,6 +1263,13 @@ def generate_frames():
                             if not continue_loop:
                                 continue
             
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
 
             if steer_type == "RHD":
 
@@ -1268,9 +1300,12 @@ def generate_frames():
                         elif mode_1 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1287,6 +1322,15 @@ def generate_frames():
                             if not continue_loop:
                                 continue
                         
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
+
+
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_2"].values[0])in list_kamera:
                     if str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != "all":
@@ -1314,9 +1358,12 @@ def generate_frames():
                         elif mode_2 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1332,6 +1379,15 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue                
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
+
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Cycle_3"].values[0]) in list_kamera :
@@ -1360,9 +1416,12 @@ def generate_frames():
                         elif mode_3 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1379,6 +1438,15 @@ def generate_frames():
                             if not continue_loop:
                                 continue
             
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
+
+
         if car_type =="Innova":
             if steer_type == "LHD":
 
@@ -1409,9 +1477,12 @@ def generate_frames():
                         elif mode_1 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1427,7 +1498,16 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue
-                        
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
+
+
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_2"].values[0])in list_kamera:
                     if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0])!= "all":
@@ -1455,9 +1535,12 @@ def generate_frames():
                         elif mode_2 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1473,6 +1556,14 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue                
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Cycle_3"].values[0])in list_kamera:
@@ -1501,9 +1592,12 @@ def generate_frames():
                         elif mode_3 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1520,6 +1614,14 @@ def generate_frames():
                             if not continue_loop:
                                 continue
             
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
+
 
             if steer_type == "RHD":
 
@@ -1550,9 +1652,12 @@ def generate_frames():
                         elif mode_1 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1568,7 +1673,15 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue
-                        
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
+
                 #CYCLE2
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_2"].values[0]) in list_kamera:
                     if str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0]) != "all":
@@ -1596,9 +1709,12 @@ def generate_frames():
                         elif mode_2 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1614,6 +1730,14 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue                
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################
 
                 #CYCLE3      
                 if int(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Cycle_3"].values[0])in list_kamera:
@@ -1642,9 +1766,12 @@ def generate_frames():
                         elif mode_3 == 'gen2':
                             for frame in gen2(cameraa):
                                 yield frame
+                                print("terbaca gen2")
+                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0]))
                                 if status_box_Y == none_stat:
                                     kondisi_reset = 2
                                     continue_loop = False
+                                    print("terbaca gen2.2")
                                     break
                             
                             if not continue_loop:
@@ -1660,7 +1787,14 @@ def generate_frames():
                                 
                             if not continue_loop:
                                 continue
-                         
+
+                    #######################################################
+                    #######################################################
+                    else :
+                        kondisi_reset = 0
+                        break
+                    #######################################################
+                    #######################################################          
 
         #CYCLE_WAIT
         if data_seq == previous_data_seq:
