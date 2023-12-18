@@ -37,9 +37,9 @@ data_acuan = pd.Series(np.array([1]))
 nilai_ymin = 10
 nilai_ymax = 450
 
-kuota_benar = 50
+kuota_benar = 5
 kuota_salah = 50
-kuota_belum = 300
+kuota_belum = 500
 
 list_kamera = [0,1,2,3]
 
@@ -1114,40 +1114,40 @@ def generate_frames():
                         }
 
                         if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_1"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
 
                     #######################################################
                     #######################################################
@@ -1171,40 +1171,40 @@ def generate_frames():
                         }
                         
                         if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_2"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue                
                         
                     #######################################################
                     #######################################################
@@ -1228,40 +1228,40 @@ def generate_frames():
                         }
                         
                         if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "LHD"), "Mode_3"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
             
                     #######################################################
                     #######################################################
@@ -1287,40 +1287,40 @@ def generate_frames():
                         }
                         
                         if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_1"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
                         
                     #######################################################
                     #######################################################
@@ -1345,40 +1345,40 @@ def generate_frames():
                         }
                         
                         if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_2"].values[0])
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue                
 
                     #######################################################
                     #######################################################
@@ -1403,40 +1403,40 @@ def generate_frames():
                         }
 
                         if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Fortuner") & (df["Steering"] == "RHD"), "Mode_3"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
             
                     #######################################################
                     #######################################################
@@ -1464,40 +1464,40 @@ def generate_frames():
                         }
                         
                         if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_1"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
 
                     #######################################################
                     #######################################################
@@ -1522,40 +1522,40 @@ def generate_frames():
                         }
                         
                         if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_2"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue                
 
                     #######################################################
                     #######################################################
@@ -1579,40 +1579,40 @@ def generate_frames():
                         }
                         
                         if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "LHD"), "Mode_3"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
             
                     #######################################################
                     #######################################################
@@ -1639,40 +1639,40 @@ def generate_frames():
                         }
                         
                         if mode_1 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_1 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_1"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_1 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
 
                     #######################################################
                     #######################################################
@@ -1696,40 +1696,40 @@ def generate_frames():
                         }
                         
                         if mode_2 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_2 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_2"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_2 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue                
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue                
 
                     #######################################################
                     #######################################################
@@ -1753,40 +1753,40 @@ def generate_frames():
                         }
                         
                         if mode_3 == 'gen':
-                            for frame in gen(cameraa):
-                                yield frame
-                                if status_box_X == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
+                            if get_box_X2() != "all":
+                                for frame in gen(cameraa):
+                                    yield frame
+                                    if status_box_X == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
 
-                            if not continue_loop:
-                                continue
+                                if not continue_loop:
+                                    continue
 
                         elif mode_3 == 'gen2':
-                            for frame in gen2(cameraa):
-                                yield frame
-                                print("terbaca gen2")
-                                print(str(df.loc[(df["Car"] == "Innova") & (df["Steering"] == "RHD"), "Mode_3"].values[0]))
-                                if status_box_Y == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    print("terbaca gen2.2")
-                                    break
-                            
-                            if not continue_loop:
-                                continue
+                            if get_box_Y2() != "all":
+                                for frame in gen2(cameraa):
+                                    yield frame
+                                    if status_box_Y == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                
+                                if not continue_loop:
+                                    continue
                         
                         elif mode_3 == 'gen3':
-                            for frame in gen3(cameraa):
-                                yield frame
-                                if status_box_Z == none_stat:
-                                    kondisi_reset = 2
-                                    continue_loop = False
-                                    break
-                                
-                            if not continue_loop:
-                                continue
+                            if get_box_Z2() != "all":
+                                for frame in gen3(cameraa):
+                                    yield frame
+                                    if status_box_Z == none_stat:
+                                        kondisi_reset = 2
+                                        continue_loop = False
+                                        break
+                                    
+                                if not continue_loop:
+                                    continue
 
                     #######################################################
                     #######################################################
