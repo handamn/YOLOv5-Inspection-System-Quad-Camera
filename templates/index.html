@@ -26,7 +26,7 @@
 
         .corner {
             border-radius: 25px;
-            border: 10px solid #bb0202;
+            border: 10px solid #235f95;
             padding: 10px;
             width:auto;
             height:auto;
@@ -41,19 +41,20 @@
 
         .header {
             display: flex;
-            background-color: #a4a4a4;
-            border: 5px solid #000000;
+            background-color: #2a2a2a;
+            border: 5px solid #888888;
             margin: 0;
             
         }
 
         .header-item {
             flex-basis: 10%;
-            border: 5px solid #000000;
+            border: 5px solid #888888;
             float: left;
             width: auto;
             margin: 0;
             flex-grow: 1;
+            color: #ffffff;
         }
 
         .header-item-status{
@@ -85,7 +86,9 @@
 
         .col1 {
             width: 17%;
-            background-color: #f1f1f1;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 5px solid #888888;
             flex-direction: column;
             justify-content: center;
             text-align: left;
@@ -98,7 +101,9 @@
 
         .col2 {
             width: 17%;
-            background-color: #d3d3d3;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 5px solid #888888;
             flex-direction: column;
             justify-content: center;
             text-align: left;
@@ -109,24 +114,32 @@
         }
 
         .col3 {
-            width: 55%;
-            background-color: #c0c0c0;
+            width: 61%;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 5px solid #888888;
         }
 
         .colx {
-            width: 11%;
-            background-color: #b5b5b5;
+            width: 15%;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 5px solid #888888;
         }
 
         .col4{
             width: 30%;
-            background-color: #9d9d9d;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 5px solid #888888;
             
         }
 
         .col5{
             width: 70%;
-            background-color: #a3a3a3;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 5px solid #888888;
         }
 
         table {
@@ -142,7 +155,7 @@
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #858585;
         }
 
         #resetButton {
@@ -150,11 +163,49 @@
         padding: 40px 40px;
         border-radius: 25px;
         border: 10px solid #000000;
-        background-color: #05d105;
+        background-color: #cf0400;
+        color: #ffffff;
         width: 900px;
         height: 300px;
         font-weight: bold;
         }
+
+        :root {
+            --container1-bg-color: #b5b5b5;
+            --container1-text-color: #ffffff;
+            --container2-bg-color: #b5b5b5;
+            --container2-text-color: #ffffff;
+            --container3-bg-color: #b5b5b5;
+            --container3-text-color: #ffffff;
+        }
+
+        .containerx {
+            width: 350px;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 120px;
+            font-weight: bold;
+            border-radius: 25px;
+            border: 20px solid #000000;
+        }
+
+        .containerx1 {
+            background-color: var(--container1-bg-color);
+            color: var(--container1-text-color);
+        }
+
+        .containerx2 {
+            background-color: var(--container2-bg-color);
+            color: var(--container2-text-color);
+        }
+
+        .containerx3 {
+            background-color: var(--container3-bg-color);
+            color: var(--container3-text-color);
+        }
+
 
 
     </style>
@@ -191,6 +242,11 @@
             <!-- Kolom  -->
             <h3>Suffix:</h3>
             <h1 id="suffix", style="display: flex; justify-content: center; align-items: center;">Suffix:</h1>
+        </div>
+        <div class="header-item">
+            <!-- Kolom  -->
+            <h3>Trimming Code:</h3>
+            <h1 id="trimming_code", style="display: flex; justify-content: center; align-items: center;">Trim Code :</h1>
         </div>
         <div class="header-item">
             <!-- Kolom  -->
@@ -254,16 +310,9 @@
 
         </div>
         <div class="col colx">
-            <h2>UHUYY</h2>
-            <div class="containerx container1">
-                <h1>{{ random_string_1 }}</h1>
-            </div>
-            <div class="containerx container2">
-                <h1>{{ random_string_2 }}</h1>
-            </div>
-            <div class="containerx container3">
-                <h1>{{ random_string_3 }}</h1>
-            </div>
+            <div class="containerx containerx1" id="containerx1"></div>
+            <div class="containerx containerx2" id="containerx2"></div>
+            <div class="containerx containerx3" id="containerx3"></div>
         </div>
     </div>
 
@@ -302,7 +351,7 @@
         <div class="col col4">
             <h2>BUTTON</h2>
             <button id="resetButton" onclick="resetValue()" style="display: none;">RESET</button>
-            <p id="myValue" style="color: #a3a3a3;">{{ value }}</p>
+            <p id="myValue" style="color: #2a2a2a;">{{ value }}</p>
         </div>
 
 
@@ -313,6 +362,34 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+
+        async function fetchRandomString() {
+            const response = await fetch('/random_string');
+            const data = await response.json();
+            return data.random_string;
+        }
+
+        async function updateContainers() {
+            const randomString = await fetchRandomString();
+
+            document.documentElement.style.setProperty('--container1-bg-color', randomString === 'OK' ? '#01c652' : '#a5b5ab');
+            document.documentElement.style.setProperty('--container1-text-color', randomString === 'OK' ? '#ffffff' : '#a5b5ab');
+            document.documentElement.style.setProperty('--container2-bg-color', randomString === 'RUN' ? '#ffc408' : '#fff5d6');
+            document.documentElement.style.setProperty('--container2-text-color', randomString === 'RUN' ? '#000000' : '#fff5d6');
+            document.documentElement.style.setProperty('--container3-bg-color', randomString === 'NG' ? '#cf0400' : '#c29493');
+            document.documentElement.style.setProperty('--container3-text-color', randomString === 'NG' ? '#ffffff' : '#c29493');
+
+            const container1 = document.getElementById('containerx1');
+            const container2 = document.getElementById('containerx2');
+            const container3 = document.getElementById('containerx3');
+
+            container1.innerText = randomString;
+            container2.innerText = randomString;
+            container3.innerText = randomString;
+        }
+
+        updateContainers();
+        setInterval(updateContainers, 2000);
 
         function updateLatestImages() {
             $.ajax({
@@ -461,6 +538,7 @@
                         document.getElementById('car').innerText = data.car;
                         document.getElementById('steer').innerText = data.steer;
                         document.getElementById('suffix').innerText = data.suffix;
+                        document.getElementById('trimming_code').innerText = data.trimming_code;
                         document.getElementById('Kode_relay').innerText = data.Kode_relay;
                         document.getElementById('Box_X').innerText = data.Box_X;
                         document.getElementById('Box_Y').innerText = data.Box_Y;
@@ -471,7 +549,7 @@
                         document.getElementById('vin_no').innerText = "";
                         document.getElementById('car').innerText = "";
                         document.getElementById('steer').innerText = "";
-                        document.getElementById('suffix').innerText = "";
+                        document.getElementById('trimming_code').innerText = "";
                         document.getElementById('Kode_relay').innerText = "";
                         document.getElementById('Box_X').innerText = "";
                         document.getElementById('Box_Y').innerText = "";
